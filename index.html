@@ -3,767 +3,599 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Alex — Alex Automotive AI Specialist</title>
+  <title>Alex — Alex Automotive</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
     :root{
-      --bg:#08090b;
-      --s1:#0e1114;
-      --s2:#13171c;
-      --s3:#1a2028;
-      --border:#1f2830;
-      --border2:#263040;
-      --green:#00ff87;
-      --gdim:#00c866;
-      --gdark:#007a3d;
-      --glow:#00ff8722;
-      --glow2:#00ff8744;
-      --amber:#ffb830;
-      --blue:#38bdf8;
-      --red:#ff4060;
-      --text:#ddeeff;
-      --sub:#7a9bb5;
-      --muted:#3a5268;
-      --user-bub:#0a2218;
-      --user-border:#0f3a28;
+      --bg:#08090b; --s1:#0e1114; --s2:#13171c; --s3:#1a2028;
+      --border:#1f2830; --border2:#263040;
+      --green:#00ff87; --gdim:#00c866; --gdark:#007a3d; --glow:#00ff8722; --glow2:#00ff8744;
+      --amber:#ffb830; --blue:#38bdf8; --red:#ff4060;
+      --text:#ddeeff; --sub:#7a9bb5; --muted:#3a5268;
+      --user-bub:#0a2218; --user-border:#0f3a28;
     }
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow:hidden}
 
-    html,body{height:100%;background:var(--bg);color:var(--text);
-      font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow:hidden}
+    /* BG */
+    body::before{content:'';position:fixed;inset:0;z-index:0;
+      background:radial-gradient(ellipse 70% 45% at 50% -5%,#00ff8712 0%,transparent 65%),
+                 radial-gradient(ellipse 40% 30% at 85% 80%,#38bdf808 0%,transparent 60%);
+      pointer-events:none}
+    body::after{content:'';position:fixed;inset:0;z-index:0;
+      background-image:linear-gradient(var(--border) 1px,transparent 1px),
+                       linear-gradient(90deg,var(--border) 1px,transparent 1px);
+      background-size:52px 52px;opacity:.22;pointer-events:none}
 
-    /* ── ATMOSPHERIC BG ── */
-    .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none}
-    .bg-fx::before{
-      content:'';position:absolute;inset:0;
-      background:
-        radial-gradient(ellipse 60% 40% at 50% -5%, #00ff8712 0%, transparent 65%),
-        radial-gradient(ellipse 30% 30% at 85% 80%, #38bdf808 0%, transparent 60%),
-        radial-gradient(ellipse 40% 25% at 10% 70%, #00ff8706 0%, transparent 60%);
-    }
-    .bg-grid{
-      position:absolute;inset:0;
-      background-image:
-        linear-gradient(var(--border) 1px,transparent 1px),
-        linear-gradient(90deg,var(--border) 1px,transparent 1px);
-      background-size:52px 52px;opacity:.3;
-    }
-    .bg-scan{
-      position:absolute;inset:0;
-      background:repeating-linear-gradient(0deg,transparent,transparent 2px,#00000018 2px,#00000018 4px);
-      pointer-events:none;
-    }
+    #app{position:relative;z-index:1;display:flex;flex-direction:column;height:100dvh;max-width:720px;margin:0 auto}
 
-    /* ── LAYOUT ── */
-    #app{
-      position:relative;z-index:1;
-      display:flex;flex-direction:column;
-      height:100dvh;max-width:720px;margin:0 auto;
-    }
-
-    /* ── HEADER ── */
-    header{
-      flex-shrink:0;
-      padding:0 24px;
-      border-bottom:1px solid var(--border);
-      background:linear-gradient(180deg,#0b0e1288,transparent);
-      backdrop-filter:blur(12px);
-    }
-    .header-inner{
-      display:flex;align-items:center;gap:16px;
-      padding:14px 0;
-    }
-    .logo-wrap{position:relative;flex-shrink:0}
-    .logo-ring{
-      width:50px;height:50px;border-radius:50%;
-      border:1.5px solid var(--green);
-      display:flex;align-items:center;justify-content:center;
-      font-size:22px;
-      box-shadow:0 0 0 4px var(--glow),0 0 24px var(--glow2);
-      animation:ring-pulse 3s ease-in-out infinite;
-    }
-    @keyframes ring-pulse{
-      0%,100%{box-shadow:0 0 0 3px var(--glow),0 0 20px var(--glow)}
-      50%{box-shadow:0 0 0 6px var(--glow),0 0 40px var(--glow2),0 0 80px #00ff8710}
-    }
-    .status-pip{
-      position:absolute;bottom:1px;right:1px;
-      width:11px;height:11px;border-radius:50%;
-      background:var(--green);border:2px solid var(--bg);
-      animation:pip 1.4s ease infinite alternate;
-    }
-    @keyframes pip{from{opacity:1}to{opacity:.3}}
-
-    .header-text{flex:1;min-width:0}
-    .header-text h1{
-      font-family:'Bebas Neue',sans-serif;
-      font-size:1.75rem;letter-spacing:.08em;line-height:1;
-      color:var(--text);
-    }
-    .header-text h1 .accent{color:var(--green)}
-    .header-text p{font-size:.7rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
-
-    .header-badges{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
-    .badge{
-      font-family:'JetBrains Mono',monospace;
-      font-size:.6rem;letter-spacing:.08em;
-      padding:3px 9px;border-radius:4px;
-      border:1px solid;
-    }
+    /* HEADER */
+    header{flex-shrink:0;padding:0 22px;border-bottom:1px solid var(--border);backdrop-filter:blur(10px)}
+    .hrow{display:flex;align-items:center;gap:14px;padding:13px 0}
+    .logo{width:48px;height:48px;border-radius:50%;border:1.5px solid var(--green);
+      display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;
+      box-shadow:0 0 0 4px var(--glow),0 0 22px var(--glow2);
+      animation:rpulse 3s ease-in-out infinite;position:relative}
+    @keyframes rpulse{0%,100%{box-shadow:0 0 0 3px var(--glow),0 0 18px var(--glow)}50%{box-shadow:0 0 0 7px var(--glow),0 0 40px var(--glow2)}}
+    .pip{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;
+      background:var(--green);border:2px solid var(--bg);animation:pipa 1.3s ease infinite alternate}
+    @keyframes pipa{from{opacity:1}to{opacity:.25}}
+    .htxt{flex:1}
+    .htxt h1{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:.09em;line-height:1}
+    .htxt h1 span{color:var(--green)}
+    .htxt p{font-size:.68rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+    .hbadges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+    .badge{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.07em;
+      padding:3px 9px;border-radius:4px;border:1px solid}
     .badge.live{color:var(--green);border-color:var(--gdark);background:#00ff8710}
     .badge.book{color:var(--amber);border-color:#7a5010;background:#ffb83010}
 
-    /* ── CHAT ── */
-    #chat{
-      flex:1;overflow-y:auto;
-      padding:20px 20px 8px;
-      display:flex;flex-direction:column;gap:14px;
-      scroll-behavior:smooth;
-    }
+    /* BOOKING PROGRESS */
+    #progress{display:none;align-items:center;gap:5px;padding:8px 0 10px}
+    .bstep{flex:1;height:2.5px;border-radius:99px;background:var(--border2);transition:background .4s}
+    .bstep.done{background:var(--green)}
+    .bstep.active{background:linear-gradient(90deg,var(--green),var(--gdim));animation:bshine 1.4s ease infinite}
+    @keyframes bshine{0%,100%{opacity:1}50%{opacity:.55}}
+    #bplabel{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.07em;flex-shrink:0;margin-left:3px}
+
+    /* CHAT */
+    #chat{flex:1;overflow-y:auto;padding:18px 18px 8px;display:flex;flex-direction:column;gap:13px;scroll-behavior:smooth}
     #chat::-webkit-scrollbar{width:3px}
     #chat::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
 
-    .msg{display:flex;gap:10px;align-items:flex-end;animation:fadeUp .28s cubic-bezier(.22,1,.36,1) both}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .msg{display:flex;gap:9px;align-items:flex-end;animation:mup .26s cubic-bezier(.22,1,.36,1) both}
+    @keyframes mup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .msg.user{flex-direction:row-reverse}
-
-    .ava{
-      width:32px;height:32px;border-radius:50%;flex-shrink:0;
+    .ava{width:30px;height:30px;border-radius:50%;flex-shrink:0;
       display:flex;align-items:center;justify-content:center;
-      font-size:13px;font-weight:700;
-      font-family:'JetBrains Mono',monospace;
-    }
-    .msg.alex .ava{
-      background:var(--green);color:#000;
-      box-shadow:0 0 12px var(--glow2);
-    }
+      font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace}
+    .msg.alex .ava{background:var(--green);color:#000;box-shadow:0 0 10px var(--glow2)}
     .msg.user .ava{background:var(--s3);color:var(--sub);border:1px solid var(--border2)}
-
-    .bub{
-      max-width:78%;padding:12px 16px;
-      border-radius:18px;line-height:1.6;font-size:.88rem;
-      font-weight:300;
-    }
-    .msg.alex .bub{
-      background:var(--s2);
-      border:1px solid var(--border2);
-      border-bottom-left-radius:4px;
-    }
-    .msg.user .bub{
-      background:var(--user-bub);
-      border:1px solid var(--user-border);
-      border-bottom-right-radius:4px;
-      color:#b8f0d8;
-    }
+    .bub{max-width:80%;padding:11px 15px;border-radius:18px;line-height:1.62;font-size:.87rem;font-weight:300}
+    .msg.alex .bub{background:var(--s2);border:1px solid var(--border2);border-bottom-left-radius:4px}
+    .msg.user .bub{background:var(--user-bub);border:1px solid var(--user-border);border-bottom-right-radius:4px;color:#b8f0d8}
     .bub strong{color:var(--green);font-weight:500}
     .bub .hi{color:var(--amber);font-weight:500}
 
-    /* booking card inside bubble */
-    .booking-card{
-      margin-top:10px;padding:12px 14px;
-      background:var(--s3);border:1px solid var(--green);
-      border-radius:10px;font-size:.82rem;
-    }
-    .booking-card .label{color:var(--sub);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
-    .booking-card .value{color:var(--text);font-weight:500;margin-bottom:8px}
-    .booking-card .value:last-child{margin-bottom:0}
+    /* booking card */
+    .bcard{margin-top:10px;padding:12px 14px;background:var(--s3);border:1px solid var(--green);border-radius:10px;font-size:.81rem}
+    .bcard .lbl{color:var(--sub);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px}
+    .bcard .val{color:var(--text);font-weight:500;margin-bottom:8px}
+    .bcard .val:last-child{margin-bottom:0}
 
-    /* ── LIVE TRANSCRIPT ── */
-    #live{
-      flex-shrink:0;min-height:26px;
-      padding:4px 24px;
-      font-size:.75rem;color:var(--sub);font-style:italic;
-      font-family:'DM Sans',sans-serif;
-      transition:opacity .3s;
-    }
+    /* LIVE TEXT */
+    #live{flex-shrink:0;min-height:24px;padding:3px 22px;font-size:.73rem;color:var(--sub);font-style:italic}
 
-    /* ── STATUS BAR ── */
-    #sbar{
-      flex-shrink:0;
-      display:flex;align-items:center;gap:8px;
-      padding:4px 24px 6px;
-      font-family:'JetBrains Mono',monospace;
-      font-size:.65rem;letter-spacing:.04em;color:var(--muted);min-height:28px;
-    }
+    /* STATUS */
+    #sbar{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:3px 22px 5px;
+      font-family:'JetBrains Mono',monospace;font-size:.63rem;letter-spacing:.04em;color:var(--muted);min-height:26px}
     #sdot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
-    #sdot.listening{background:var(--green);animation:sdotblink .5s ease infinite alternate}
-    #sdot.speaking{background:var(--blue);animation:sdotblink .8s ease infinite alternate}
-    #sdot.booking{background:var(--amber);animation:sdotblink 1s ease infinite alternate}
+    #sdot.listening{background:var(--green);animation:db .5s ease infinite alternate}
+    #sdot.speaking{background:var(--blue);animation:db .8s ease infinite alternate}
+    #sdot.booking{background:var(--amber);animation:db 1s ease infinite alternate}
     #sdot.error{background:var(--red)}
-    @keyframes sdotblink{from{opacity:1}to{opacity:.2}}
-
-    /* waveform */
-    #wave{display:flex;align-items:center;gap:2.5px;height:16px;opacity:0;transition:opacity .3s;margin-left:2px}
+    @keyframes db{from{opacity:1}to{opacity:.15}}
+    #wave{display:flex;align-items:center;gap:2px;height:14px;opacity:0;transition:opacity .3s;margin-left:2px}
     #wave.on{opacity:1}
     #wave i{display:block;width:2.5px;border-radius:99px;background:var(--green)}
-    #wave i:nth-child(1){height:5px;animation:wv 1s ease-in-out infinite 0s}
-    #wave i:nth-child(2){height:10px;animation:wv 1s ease-in-out infinite .1s}
-    #wave i:nth-child(3){height:16px;animation:wv 1s ease-in-out infinite .2s}
-    #wave i:nth-child(4){height:10px;animation:wv 1s ease-in-out infinite .1s}
-    #wave i:nth-child(5){height:5px;animation:wv 1s ease-in-out infinite 0s}
-    @keyframes wv{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.3)}}
+    #wave i:nth-child(1){height:4px;animation:wv 1s ease-in-out infinite 0s}
+    #wave i:nth-child(2){height:9px;animation:wv 1s ease-in-out infinite .1s}
+    #wave i:nth-child(3){height:14px;animation:wv 1s ease-in-out infinite .2s}
+    #wave i:nth-child(4){height:9px;animation:wv 1s ease-in-out infinite .1s}
+    #wave i:nth-child(5){height:4px;animation:wv 1s ease-in-out infinite 0s}
+    @keyframes wv{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.28)}}
 
-    /* ── CONTROLS ── */
-    #controls{flex-shrink:0;padding:10px 20px 18px;display:flex;flex-direction:column;align-items:center;gap:10px}
-
-    #mic{
-      width:100%;max-width:460px;height:64px;
-      border:none;border-radius:12px;cursor:pointer;
+    /* CONTROLS */
+    #controls{flex-shrink:0;padding:8px 18px 16px;display:flex;flex-direction:column;align-items:center;gap:9px}
+    #mic{width:100%;max-width:460px;height:62px;border:none;border-radius:12px;cursor:pointer;
       background:linear-gradient(135deg,var(--gdim),var(--green));
-      font-family:'Bebas Neue',sans-serif;
-      font-size:1.25rem;letter-spacing:.12em;color:#000;
-      display:flex;align-items:center;justify-content:center;gap:12px;
-      box-shadow:0 0 30px var(--glow2),0 4px 20px #00000060;
-      transition:transform .15s,box-shadow .15s,opacity .15s;
-      position:relative;overflow:hidden;
-    }
-    #mic::after{
-      content:'';position:absolute;inset:0;
-      background:linear-gradient(135deg,#ffffff20 0%,transparent 55%);
-      pointer-events:none;
-    }
-    #mic:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 50px var(--glow2),0 8px 28px #00000080}
+      font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.12em;color:#000;
+      display:flex;align-items:center;justify-content:center;gap:11px;
+      box-shadow:0 0 28px var(--glow2),0 4px 18px #00000055;
+      transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden}
+    #mic::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#ffffff1a,transparent);pointer-events:none}
+    #mic:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 48px var(--glow2),0 8px 26px #00000070}
     #mic:active:not(:disabled){transform:translateY(1px)}
     #mic:disabled{opacity:.35;cursor:not-allowed}
-    #mic.on{
-      background:linear-gradient(135deg,#9a0020,var(--red));
-      box-shadow:0 0 30px #ff406022,0 4px 20px #00000060;
-    }
+    #mic.on{background:linear-gradient(135deg,#8a001a,var(--red));box-shadow:0 0 28px #ff406025,0 4px 18px #00000055}
 
-    .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;max-width:520px}
-    .chip{
-      background:var(--s2);border:1px solid var(--border2);
-      color:var(--sub);font-size:.68rem;letter-spacing:.04em;
-      padding:5px 14px;border-radius:6px;cursor:pointer;
-      font-family:'JetBrains Mono',monospace;
-      transition:border-color .2s,color .2s,background .2s;
-    }
+    .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:520px}
+    .chip{background:var(--s2);border:1px solid var(--border2);color:var(--sub);
+      font-size:.67rem;letter-spacing:.04em;padding:5px 13px;border-radius:6px;cursor:pointer;
+      font-family:'JetBrains Mono',monospace;transition:border-color .2s,color .2s,background .2s}
     .chip:hover{border-color:var(--gdim);color:var(--green);background:#00ff870a}
     .chip.amber{border-color:#7a5010;color:var(--amber)}
     .chip.amber:hover{border-color:var(--amber);background:#ffb83010}
 
     /* typing dots */
-    .typing-dots{display:flex;align-items:center;gap:5px;padding:11px 15px}
-    .typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:tdot .85s ease infinite}
-    .typing-dots span:nth-child(2){animation-delay:.16s}
-    .typing-dots span:nth-child(3){animation-delay:.32s}
-    @keyframes tdot{0%,80%,100%{transform:scale(1)}40%{transform:scale(1.6)}}
-
-    /* progress bar for booking */
-    .booking-progress{
-      display:flex;align-items:center;gap:6px;
-      padding:8px 24px;flex-shrink:0;
-    }
-    .bp-step{
-      flex:1;height:3px;border-radius:99px;
-      background:var(--border2);transition:background .4s;
-    }
-    .bp-step.done{background:var(--green)}
-    .bp-step.active{background:linear-gradient(90deg,var(--green),var(--gdim));animation:shine 1.5s ease infinite}
-    @keyframes shine{0%,100%{opacity:1}50%{opacity:.6}}
-    .bp-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.06em;margin-left:4px;flex-shrink:0}
+    .tdots{display:flex;align-items:center;gap:5px;padding:11px 15px}
+    .tdots span{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:td .85s ease infinite}
+    .tdots span:nth-child(2){animation-delay:.16s}
+    .tdots span:nth-child(3){animation-delay:.32s}
+    @keyframes td{0%,80%,100%{transform:scale(1)}40%{transform:scale(1.6)}}
   </style>
 </head>
 <body>
-
-<div class="bg-fx"><div class="bg-grid"></div><div class="bg-scan"></div></div>
-
 <div id="app">
   <header>
-    <div class="header-inner">
-      <div class="logo-wrap">
-        <div class="logo-ring">🚗</div>
-        <div class="status-pip"></div>
-      </div>
-      <div class="header-text">
-        <h1>ALEX <span class="accent">AUTO</span></h1>
+    <div class="hrow">
+      <div class="logo">🚗<div class="pip"></div></div>
+      <div class="htxt">
+        <h1>ALEX <span>AUTO</span></h1>
         <p>AI Specialist · Test Drives · EVs · Financing</p>
       </div>
-      <div class="header-badges">
+      <div class="hbadges">
         <div class="badge live">● LIVE</div>
         <div class="badge book">BOOK NOW</div>
       </div>
     </div>
-
-    <!-- Booking progress bar (hidden until booking starts) -->
-    <div class="booking-progress" id="progress" style="display:none">
-      <div class="bp-step" id="bp1"></div>
-      <div class="bp-step" id="bp2"></div>
-      <div class="bp-step" id="bp3"></div>
-      <div class="bp-step" id="bp4"></div>
-      <div class="bp-step" id="bp5"></div>
-      <span class="bp-label" id="bplabel">BOOKING</span>
+    <div id="progress">
+      <div class="bstep" id="bp0"></div>
+      <div class="bstep" id="bp1"></div>
+      <div class="bstep" id="bp2"></div>
+      <div class="bstep" id="bp3"></div>
+      <div class="bstep" id="bp4"></div>
+      <span id="bplabel">BOOKING</span>
     </div>
   </header>
 
   <div id="chat"></div>
   <div id="live"></div>
-
   <div id="sbar">
     <div id="sdot"></div>
-    <span id="stxt">Ready — tap the mic or a quick action below</span>
+    <span id="stxt">Tap the mic — then just talk naturally</span>
     <div id="wave"><i></i><i></i><i></i><i></i><i></i></div>
   </div>
 
   <div id="controls">
-    <button id="mic">🎤 &nbsp; TALK TO ALEX</button>
-    <div class="chips" id="chips">
+    <button id="mic">🎤 &nbsp; START TALKING TO ALEX</button>
+    <div class="chips">
       <div class="chip" onclick="chip('What cars do you have in stock?')">🚘 Inventory</div>
       <div class="chip amber" onclick="chip('I want to book a test drive')">📅 Book Test Drive</div>
       <div class="chip" onclick="chip('Tell me about your electric cars')">⚡ EVs</div>
       <div class="chip" onclick="chip('What trucks do you have?')">🛻 Trucks</div>
       <div class="chip" onclick="chip('Tell me about the Mustang')">🐎 Mustang</div>
-      <div class="chip amber" onclick="chip('I want to schedule a service appointment')">🔧 Service</div>
+      <div class="chip amber" onclick="chip('I need to book a service appointment')">🔧 Service</div>
       <div class="chip" onclick="chip('What financing options do you have?')">💳 Finance</div>
-      <div class="chip" onclick="chip('What are your hours and location?')">📍 Find Us</div>
+      <div class="chip" onclick="chip('Where are you located?')">📍 Find Us</div>
     </div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  ALEX PRO — Conversational Car Dealership Voice Agent
-//  Full booking workflow · Natural speech · Human personality
-// ═══════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
+//  ALEX ULTIMATE — Natural, continuous, warm, human-feeling
+//  ONE TAP → full back-and-forth conversation
+// ─────────────────────────────────────────────────────────────
 
-const chatEl  = document.getElementById('chat');
-const micBtn  = document.getElementById('mic');
-const sdot    = document.getElementById('sdot');
-const stxt    = document.getElementById('stxt');
-const waveEl  = document.getElementById('wave');
-const liveEl  = document.getElementById('live');
-const progEl  = document.getElementById('progress');
+const chatEl = document.getElementById('chat');
+const micBtn = document.getElementById('mic');
+const sdot   = document.getElementById('sdot');
+const stxt   = document.getElementById('stxt');
+const waveEl = document.getElementById('wave');
+const liveEl = document.getElementById('live');
+const progEl = document.getElementById('progress');
 
-let SR, isListening = false, isSpeaking = false;
-let silenceTimer = null;
+let SR = null;
+let conversationOn = false;  // single toggle — on = full conversation loop
+let alexTalking    = false;
+let keepAliveTimer = null;
+let silenceTimer   = null;
+let resumeTimer    = null;   // Chrome speech synthesis keep-alive
 
-// ── BOOKING STATE ─────────────────────────────────────────────
-const BOOKING_STEPS = ['interest','date','name','phone','confirm'];
-let booking = {
-  active: false,
-  step: 0,           // index into BOOKING_STEPS
-  type: 'test drive',
-  vehicle: '',
-  date: '',
-  name: '',
-  phone: '',
-  email: '',
-};
+// ── BOOKING STATE ────────────────────────────────────────────
+const STEPS = ['vehicle','date','name','phone','email'];
+let B = { active:false, step:0, type:'test drive', vehicle:'', date:'', name:'', phone:'', email:'' };
 
-function resetBooking() {
-  booking = {active:false,step:0,type:'test drive',vehicle:'',date:'',name:'',phone:'',email:''};
+function resetBooking(){
+  B = {active:false,step:0,type:'test drive',vehicle:'',date:'',name:'',phone:'',email:''};
   progEl.style.display = 'none';
-  updateProgress(-1);
 }
-
-function updateProgress(step) {
-  const steps = document.querySelectorAll('.bp-step');
-  steps.forEach((el,i) => {
-    el.className = 'bp-step' + (i < step ? ' done' : i === step ? ' active' : '');
+function setProgress(i){
+  STEPS.forEach((_,idx)=>{
+    const el = document.getElementById('bp'+idx);
+    if(!el) return;
+    el.className = 'bstep' + (idx < i ? ' done' : idx === i ? ' active' : '');
   });
-  const labels = ['VEHICLE','DATE','YOUR NAME','CONTACT','CONFIRM'];
-  const lbl = document.getElementById('bplabel');
-  if(step >= 0 && step < labels.length) lbl.textContent = labels[step];
+  const labels = ['VEHICLE','DATE / TIME','YOUR NAME','PHONE','EMAIL'];
+  document.getElementById('bplabel').textContent = i >= 0 && i < labels.length ? labels[i] : 'BOOKING';
 }
 
-// ── PICK RANDOM FROM ARRAY ────────────────────────────────────
-function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+// ── HELPERS ──────────────────────────────────────────────────
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 
-// ══════════════════════════════════════════════════════════════
-//  RESPONSES — Natural, warm, varied
-// ══════════════════════════════════════════════════════════════
+// ── RESPONSES — rich, warm, natural speech ───────────────────
+// Key technique: shorter sentences, contractions, filler sounds
+// written into the text itself so the TTS reads naturally
 
 const R = {
-  greet: [
-    `Hey, welcome to <strong>Alex Automotive</strong>! I'm Alex — think of me as your personal car guide here. We've got an awesome lineup right now — new arrivals, EVs, trucks, financing deals... honestly a little bit of everything. Are you shopping for something specific, or just exploring your options today?`,
-    `Hi there! Great to have you at <strong>Alex Automotive</strong>! I'm Alex, your AI car specialist. Whether you're after a test drive, want to check out our EVs, or just want to talk financing — I'm here for all of it. So, what's on your mind today?`,
-    `Hey! Welcome! I'm Alex, and I've gotta say — you picked a great time to come by <strong>Alex Automotive</strong>. We've got some really exciting inventory right now, including new EVs and some killer financing deals. What kind of car are you looking for?`,
+  greet:[
+    `Hey! Welcome to Alex Automotive. I'm Alex, and honestly I love this job because I get to help people find their perfect car. So — are you shopping for something specific today, or just exploring your options?`,
+    `Oh hey, welcome in! I'm Alex — your car specialist here at Alex Auto. We've got a really great lineup right now, and I'd love to help you find something you're excited about. What are you thinking?`,
+    `Hi there! Great timing — I was just thinking about how much I love our new EV selection. Anyway, I'm Alex! Whether you're after a test drive, curious about pricing, or want to explore financing — I'm here for it. What's on your mind?`,
+    `Hey, good to have you here! I'm Alex, your personal guide at Alex Automotive. Think of me as that car-obsessed friend who also happens to know everything about deals and inventory. So — what kind of car are we talking about today?`,
   ],
 
-  inventory: [
-    `Okay great, let me give you the quick tour! Right now we've got:\n\n<strong>Sedans</strong> — Honda Civic ($23,500), Toyota Camry ($27,900), Hyundai Sonata ($26,400)\n<strong>SUVs</strong> — Ford Explorer, Toyota RAV4, Chevy Equinox, Kia Sportage\n<strong>Trucks</strong> — F-150, Silverado, Ram 1500, Tacoma\n<strong>Electric</strong> — Chevy Bolt EV, Tesla Model 3, Mustang Mach-E, Hyundai Ioniq 6\n\nHonestly — what kind of driving do you do most? That'll help me point you right.`,
-    `Sure! We're stocked up really well right now. Sedans, SUVs, trucks, EVs — got a good mix across all price ranges too, from around twenty-three grand up to luxury territory. Is there a particular type you're drawn to? Or a budget range I should work within?`,
+  inventory:[
+    `Oh great question. So right now we've got a really solid spread. Sedans — Honda Civic, Toyota Camry, Hyundai Sonata, all in the twenty to twenty-eight thousand range. SUVs — RAV4, Explorer, Equinox, Sportage. Trucks — F-150, Silverado, Ram 1500, Tacoma. And a growing EV section too. Honestly, what kind of driving do you mostly do? That'll help me narrow it down.`,
+    `Sure! We're stocked up pretty well. Sedans, SUVs, trucks, EVs — a good mix across all price ranges. Some really exciting stuff just came in too. What matters most to you — reliability, fuel economy, looks, size? Let's figure out what fits your life.`,
   ],
 
-  trucks: [
-    `Oh, trucks — yes! Okay so here's what we've got on the lot: <strong>Ford F-150 at $39,000</strong>, <strong>Chevy Silverado at $41,500</strong>, <strong>Ram 1500 at $43,200</strong>, and the <strong>Toyota Tacoma at $35,000</strong>. The F-150 is our top seller — incredibly versatile. The Ram has this almost luxury-level interior which surprises people. Are you using it more for work or weekend stuff?`,
-    `Trucks! Love talking trucks. F-150, Silverado, Ram 1500, Tacoma — all in stock. The F-150 is the crowd favourite, Ram has the nicest interior, Tacoma is basically indestructible. What would you mainly be doing with it?`,
+  trucks:[
+    `Oh yeah, trucks — now we're talking! So we've got the Ford F-150 starting at thirty-nine thousand, the Chevy Silverado at forty-one five, Ram 1500 at forty-three two, and the Toyota Tacoma at thirty-five. Honestly the F-150 is our best seller — so versatile. But the Ram has this incredible interior, almost feels luxury. Are you using it more for work, hauling stuff, or more of a weekend adventure truck?`,
+    `Trucks! Love it. Okay so — F-150, Silverado, Ram 1500, Tacoma — all on the lot. The F-150 is the crowd favourite. The Ram is the comfy one. The Tacoma is basically bulletproof reliable. What would you be doing with it mostly?`,
   ],
 
-  electric: [
-    `Great choice looking at EVs! Our current electric lineup is pretty solid: <strong>Chevy Bolt EV at $26,500</strong> (best value out there right now), <strong>Tesla Model 3 at $41,990</strong>, <strong>Ford Mustang Mach-E at $42,995</strong>, and the <strong>Hyundai Ioniq 6 at $38,615</strong>. There are also federal tax credits that could knock several thousand off the price. Is this your first EV, or are you upgrading?`,
-    `EVs — smart move! We've got the Bolt EV, Model 3, Mach-E, and Ioniq 6. The Bolt is incredible value. The Mach-E looks amazing and has great range. Depending on eligibility, you might also qualify for a $7,500 federal tax credit. Would you like to set up a test drive so you can feel the difference?`,
+  electric:[
+    `Smart move — EVs are honestly where it's at right now. So we've got the Chevy Bolt EV at twenty-six five, which is incredible value. Tesla Model 3 at around forty-two grand. Ford Mustang Mach-E at forty-three. And the Hyundai Ioniq 6 at thirty-eight six — stunning car. Plus there are federal tax credits that could knock several thousand off the price. Is this your first EV, or are you upgrading from one?`,
+    `Ooh, going electric — love that! Our EV lineup is the Bolt, Model 3, Mach-E, and Ioniq 6. The Bolt is crazy good value. The Mach-E looks amazing. And you might qualify for the federal seven-five hundred dollar tax credit depending on your income. Want to set up a test drive so you can really feel the difference? It's kind of a game changer.`,
   ],
 
-  mustang: [
-    `The Mustang! Oh man, this is my favourite topic. Okay, so we've got the full lineup: <strong>EcoBoost at $32,515</strong> — honestly really fun to drive and great on fuel. <strong>GT at $42,515</strong> — the V8, that sound, it's just iconic. <strong>Dark Horse at $57,970</strong> — track-ready from the factory. And the <strong>Mach-E at $42,995</strong> if you want that Mustang energy in a full electric. Which direction are you leaning? Because I can absolutely get you behind the wheel of any of these.`,
+  mustang:[
+    `The Mustang — okay this is genuinely my favourite topic. So we've got the full lineup. EcoBoost at thirty-two five — actually really fun to drive and great on fuel. GT with the V8 at forty-two five — that sound is just iconic, honestly. The Dark Horse at fifty-seven nine — track ready right off the lot. And the Mach-E at forty-three grand if you want that Mustang energy but fully electric. Seriously though — have you ever driven a V8 Mustang? Because if not, the GT might just change your life.`,
   ],
 
-  suv: [
-    `SUVs are honestly our most popular category right now. We've got the <strong>Toyota RAV4 at $31,200</strong> — super reliable, huge resale value. <strong>Ford Explorer at $42,000</strong> — perfect for families, lots of space. <strong>Chevy Equinox at $33,500</strong> — really well priced for what you get. And the <strong>Kia Sportage at $29,800</strong> — underrated but fantastic. What's your main priority — space, fuel economy, budget?`,
+  suv:[
+    `SUVs are our most popular right now — and honestly for good reason. RAV4 at thirty-one two — super reliable, great resale value. Ford Explorer at forty-two — perfect for families. Chevy Equinox at thirty-three five — great value for what you get. Kia Sportage at twenty-nine eight — underrated but fantastic. What's your main priority — space, fuel economy, or staying within a certain budget?`,
   ],
 
-  sedan: [
-    `For sedans, we've got some great options! <strong>Honda Civic at $23,500</strong> — amazing reliability and efficiency. <strong>Toyota Camry at $27,900</strong> — honestly one of the best long-term investments you can make. <strong>Hyundai Sonata at $26,400</strong> — packed with features at a great price. Is this for daily commuting, or more of an everything car?`,
+  sedan:[
+    `For sedans we've got some great choices. Honda Civic at twenty-three five — amazing reliability and efficiency. Toyota Camry at twenty-seven nine — one of the best long-term investments honestly. Hyundai Sonata at twenty-six four — packed with features. Is this mainly for daily commuting, or more of an all-around car?`,
   ],
 
-  finance: [
-    `Financing is honestly way less scary than people think! Right now we've got <strong>0% APR for 36 months</strong> on select models — that's huge. Also 60 and 72-month options for lower monthly payments. Trade-ins are welcome and we can usually get you up to <strong>$5,000 credit</strong> depending on the vehicle. Pre-approval is quick — takes like five minutes online. Want me to help you get started with a booking to go over the numbers in detail?`,
-    `Great question on financing! We've got some competitive offers right now — zero percent APR on select models, flexible terms, and we work with most credit situations. Trade-in value too. Honestly the best next step is to come in and sit with our finance team — want to book a consultation?`,
+  finance:[
+    `Financing — great thing to ask about. So right now we've got zero percent APR for thirty-six months on select models, which is huge. Also sixty and seventy-two month options for lower monthly payments. We do trade-ins too — depending on your car you might get up to five thousand dollars off. And pre-approval literally takes like five minutes online. Honestly it's way less stressful than people expect. Want me to help get a booking set up so you can sit down with our finance team?`,
   ],
 
-  hours: [
-    `We're open <strong>Monday through Saturday, 9 AM to 8 PM</strong>, and <strong>Sundays 11 AM to 5 PM</strong>. Find us at <strong>1200 Auto Drive, Motorville</strong> — big Alex Auto sign, can't miss it. You can also reach us at <strong>(555) 280-4100</strong>. Want to lock in a time so someone's ready for you when you arrive?`,
+  hours:[
+    `So we're open Monday through Saturday, nine AM to eight PM, and Sundays eleven to five. We're at 1200 Auto Drive in Motorville — big Alex Auto sign out front, you really can't miss it. You can also call us at 555-280-4100. Want to lock in a time so someone's ready for you when you arrive?`,
   ],
 
-  service: [
-    `Absolutely, we'd love to take care of your vehicle! Our service centre handles everything — routine maintenance, diagnostics, repairs, detailing. Let me get you booked in. What's the issue or service you need done?`,
-    `Service appointment — no problem! We've got a great team in the shop. Whether it's an oil change, full inspection, or something specific, we'll take care of it. Can you tell me a bit about what the car needs?`,
+  service:[
+    `Absolutely, we'd love to take care of your car! Our service team handles everything — oil changes, diagnostics, full inspections, repairs, detailing. Let me get you set up with a booking. What's the issue, or what service do you need done?`,
   ],
 
-  thanks: [
-    `That genuinely makes my day, thank you! 😊 I love being able to help. Is there anything else I can do for you before you head off?`,
-    `Aw, you're so welcome! That's what I'm here for. Anything else I can help with today?`,
+  thanks:[
+    `Aw, that genuinely makes my day! Happy I could help. Is there anything else you'd like to know before we wrap up?`,
+    `That's so kind, thank you! That's exactly what I'm here for. Anything else I can do for you?`,
   ],
 
-  bye: [
-    `It was so great chatting with you! Come on in anytime — we're at 1200 Auto Drive and the team will take great care of you. Hope to see you soon! 👋`,
-    `Take care! And whenever you're ready for that test drive, you know where to find us. See you at the lot! 🚗`,
+  bye:[
+    `It was so great chatting with you! Come on in anytime — we're at 1200 Auto Drive. The team will take great care of you. Hope to see you soon!`,
+    `Take care! And when you're ready for that test drive, you know where to find us. See you at the lot!`,
   ],
 
-  fallback: [
-    `Hmm, I want to make sure I actually help you — could you tell me a bit more about what you're looking for? Like, are you shopping for a specific car, thinking about financing, or wanting to book something?`,
-    `That's interesting! I want to give you the right answer. Could you give me a little more detail? I'm here for cars, test drives, bookings, financing — all of it!`,
-    `Oh, good one — I might have missed that! Could you rephrase? I'm fully focused on getting you the best experience here at Alex Auto.`,
+  fallback:[
+    `Hmm, I want to make sure I give you a good answer — could you tell me a little more about what you're looking for? Like, is it a specific car, pricing, booking a visit — something like that?`,
+    `Oh interesting! I want to actually help you, not just guess. Can you give me a bit more detail? I'm here for cars, test drives, financing, all of it.`,
+    `Good one — I might have missed that. Can you say it another way? I'm totally focused on getting you the best experience here at Alex Auto.`,
   ],
 
-  // ── BOOKING FLOW ──
-  book_start: [
-    `Awesome, let's get that booked in! I just need a few quick details — super easy, promise. First up: <strong>which vehicle</strong> are you interested in? If you're not sure, just say something like "SUV" or "electric" and I'll help you narrow it down.`,
-    `Love it — let's lock that in! Quick question first: <strong>what car</strong> are you thinking of test driving? If you're not sure yet, no worries — just give me a category and we'll figure it out!`,
+  // Booking flow — short, warm, natural
+  bookStart:[
+    `Awesome, let's get that locked in! Super quick — just a couple of details. First up: what vehicle are you interested in? Even if you're not one hundred percent sure, just say something like SUV or electric and we'll figure it out together.`,
+    `Love it — let's do this! Just need a few quick things from you. First question: which car were you thinking of for this? If you're still deciding, no worries — just give me a general idea.`,
   ],
-  book_vehicle_confirm: (v) => `Nice choice! The <strong>${v}</strong> is a great pick. Now — <strong>what day works best for you</strong>? You can say something like "this Saturday" or "next Wednesday afternoon" — whatever suits you.`,
-  book_date_confirm: (d) => `Got it, <strong>${d}</strong> — perfect. Now I just need your <strong>name</strong> so we can get the booking set up. What should I put down?`,
-  book_name_confirm: (n) => `Hi <strong>${n}</strong>! Almost there — what's the best <strong>phone number</strong> to reach you on? Our team will give you a quick call to confirm everything.`,
-  book_phone_confirm: (p) => `Perfect, got that down. Last thing — do you have an <strong>email address</strong> you'd like us to send the confirmation to? (You can say "skip" if you'd prefer not.)`,
-  book_done: (b) => `
-    <strong>🎉 Booking Request Confirmed!</strong><br><br>
-    Here's a summary of what I've got for you:
-    <div class="booking-card">
-      <div class="label">Vehicle Interest</div><div class="value">${b.vehicle}</div>
-      <div class="label">Appointment Type</div><div class="value">${b.type.charAt(0).toUpperCase()+b.type.slice(1)}</div>
-      <div class="label">Preferred Date</div><div class="value">${b.date}</div>
-      <div class="label">Name</div><div class="value">${b.name}</div>
-      <div class="label">Phone</div><div class="value">${b.phone}</div>
-      ${b.email && b.email !== 'skip' ? `<div class="label">Email</div><div class="value">${b.email}</div>` : ''}
+  bookVehicle: v => `Nice choice! The ${v} is a great pick. Now — what day and time works best for you? You can say something like this Saturday afternoon, or next Wednesday morning — whatever works.`,
+  bookDate:    d => `Got it — ${d}. Perfect. Now I just need your name so I can set the booking up properly. What should I put down?`,
+  bookName:    n => `Hi ${n}! Almost done — what's the best phone number to reach you on? Our team will give you a quick call to confirm everything.`,
+  bookPhone:   p => `Perfect, got that. Last thing — do you have an email address for the confirmation? Just say skip if you'd rather not.`,
+  bookDone:    b => `
+    <strong>Booking request confirmed!</strong> Here's your summary:<br><br>
+    <div class="bcard">
+      <div class="lbl">Type</div><div class="val">${b.type.charAt(0).toUpperCase()+b.type.slice(1)}</div>
+      <div class="lbl">Vehicle</div><div class="val">${b.vehicle}</div>
+      <div class="lbl">Preferred Date</div><div class="val">${b.date}</div>
+      <div class="lbl">Name</div><div class="val">${b.name}</div>
+      <div class="lbl">Phone</div><div class="val">${b.phone}</div>
+      ${b.email && b.email.toLowerCase()!=='skip' ? `<div class="lbl">Email</div><div class="val">${b.email}</div>` : ''}
     </div><br>
-    One of our team members will be in touch with you shortly to <strong>confirm the exact time and any details</strong>. We're really looking forward to meeting you! Is there anything else I can help with?
+    One of our team members will be in touch with you shortly to <strong>confirm the exact time</strong> and answer any last questions. We're really looking forward to meeting you! Is there anything else I can help with?
   `,
 };
 
-// ── BOOKING FLOW HANDLER ──────────────────────────────────────
-function handleBookingStep(input) {
-  const step = BOOKING_STEPS[booking.step];
-
-  if (step === 'interest') {
-    booking.vehicle = input.trim() || 'a vehicle of your choice';
-    booking.step++;
-    updateProgress(1);
-    return R.book_vehicle_confirm(booking.vehicle);
-  }
-  if (step === 'date') {
-    booking.date = input.trim() || 'a date to be confirmed';
-    booking.step++;
-    updateProgress(2);
-    return R.book_date_confirm(booking.date);
-  }
-  if (step === 'name') {
-    booking.name = input.trim() || 'Valued Customer';
-    booking.step++;
-    updateProgress(3);
-    return R.book_name_confirm(booking.name);
-  }
-  if (step === 'phone') {
-    booking.phone = input.trim() || 'to be provided';
-    booking.step++;
-    updateProgress(4);
-    return R.book_phone_confirm(booking.phone);
-  }
-  if (step === 'confirm') {
-    booking.email = input.trim();
-    booking.step++;
-    updateProgress(5);
-    const summary = R.book_done(booking);
-    resetBooking();
-    return summary;
-  }
+// ── BOOKING HANDLER ──────────────────────────────────────────
+function handleBooking(input){
+  const step = STEPS[B.step];
+  if(step==='vehicle'){ B.vehicle=input.trim()||'a vehicle of your choice'; B.step++; setProgress(1); return R.bookVehicle(B.vehicle); }
+  if(step==='date')   { B.date=input.trim()||'a date to be confirmed';      B.step++; setProgress(2); return R.bookDate(B.date); }
+  if(step==='name')   { B.name=input.trim()||'Valued Customer';             B.step++; setProgress(3); return R.bookName(B.name); }
+  if(step==='phone')  { B.phone=input.trim()||'to be provided';             B.step++; setProgress(4); return R.bookPhone(B.phone); }
+  if(step==='email')  { B.email=input.trim(); const html=R.bookDone(B); resetBooking(); return html; }
 }
 
-// ── MAIN RESPONSE ENGINE ──────────────────────────────────────
-function getReply(input) {
-  // If booking is active, route all input through booking flow
-  if (booking.active) return handleBookingStep(input);
-
-  const t = input.toLowerCase().trim();
-
-  // Greetings
-  if (/^(hi|hey|hello|good\s*(morning|afternoon|evening)|howdy|what'?s up|sup)\b/.test(t))
-    return pick(R.greet);
+// ── MAIN RESPONSE ENGINE ─────────────────────────────────────
+function getReply(input){
+  if(B.active) return handleBooking(input);
+  const t = input.toLowerCase();
 
   // Booking triggers
-  if (/\b(book|schedule|appointment|reserve|set up|arrange)\b/.test(t) || /\btest.?drive\b/.test(t) || /\bservice appoint/.test(t)) {
-    if (/service/.test(t)) booking.type = 'service appointment';
-    else if (/consult/.test(t)) booking.type = 'consultation';
-    else booking.type = 'test drive';
-    booking.active = true;
-    booking.step = 0;
-    progEl.style.display = 'flex';
-    updateProgress(0);
-    return pick(R.book_start);
+  if(/\b(book|schedule|appointment|reserve|arrange)\b/.test(t)||/\btest.?drive\b/.test(t)||/\bservice appoint/.test(t)){
+    if(/service|mainten/.test(t)) B.type='service appointment';
+    else if(/consult/.test(t)) B.type='consultation';
+    else B.type='test drive';
+    B.active=true; B.step=0;
+    progEl.style.display='flex'; setProgress(0);
+    return pick(R.bookStart);
   }
 
-  // Service
-  if (/\bservice\b|\bmaintenance\b|\boil change\b|\brepair\b|\bcheck\b/.test(t))
-    return pick(R.service);
-
-  // Trucks
-  if (/\b(truck|pickup|f.?150|silverado|ram\b|tacoma|tundra|hauling)\b/.test(t))
-    return pick(R.trucks);
-
-  // EVs
-  if (/\b(electric|ev\b|bolt\b|ioniq|mach.?e|tesla|zero.?emission|plug.?in|charging)\b/.test(t))
-    return pick(R.electric);
-
-  // Mustang
-  if (/\bmustang\b/.test(t)) return pick([R.mustang[0]]);
-
-  // SUVs
-  if (/\b(suv|crossover|explorer|equinox|rav4|sportage|4x4|awd|family car)\b/.test(t))
-    return pick(R.suv);
-
-  // Sedans
-  if (/\b(sedan|civic|camry|sonata|four.?door)\b/.test(t))
-    return pick(R.sedan);
-
-  // Finance
-  if (/\b(financ|loan|apr|monthly|payment|trade.?in|credit|down.?payment|pre.?approv|afford)\b/.test(t))
-    return pick(R.finance);
-
-  // Hours / location
-  if (/\b(hour|open|close|location|address|where|find you|directions|when)\b/.test(t))
-    return pick(R.hours);
-
-  // General inventory
-  if (/\b(inventory|stock|car|vehicle|model|option|sell|available|show me|what do you have)\b/.test(t))
-    return pick(R.inventory);
-
-  // Thanks
-  if (/\b(thank|thanks|appreciate|great job|awesome|perfect|love it)\b/.test(t))
-    return pick(R.thanks);
-
-  // Bye
-  if (/\b(bye|goodbye|later|see ya|gotta go|take care|leaving)\b/.test(t))
-    return pick(R.bye);
-
-  // Fallback
+  if(/\b(truck|pickup|f.?150|silverado|\bram\b|tacoma|tundra)\b/.test(t)) return pick(R.trucks);
+  if(/\b(electric|ev\b|bolt\b|ioniq|mach.?e|tesla|plug.?in|charging)\b/.test(t)) return pick(R.electric);
+  if(/\bmustang\b/.test(t)) return R.mustang[0];
+  if(/\b(suv|crossover|explorer|equinox|rav4|sportage|4x4|awd)\b/.test(t)) return R.suv[0];
+  if(/\b(sedan|civic|camry|sonata|four.?door)\b/.test(t)) return R.sedan[0];
+  if(/\b(financ|loan|apr|monthly|payment|trade.?in|credit|afford)\b/.test(t)) return R.finance[0];
+  if(/\b(hour|open|close|location|address|where|find you|directions)\b/.test(t)) return R.hours[0];
+  if(/\b(service|mainten|oil change|repair)\b/.test(t)) return R.service[0];
+  if(/\b(thank|thanks|appreciate|great|awesome|perfect)\b/.test(t)) return pick(R.thanks);
+  if(/\b(bye|goodbye|later|see ya|gotta go)\b/.test(t)) return pick(R.bye);
+  if(/\b(car|vehicle|inventory|stock|model|option|available|show me|what do)\b/.test(t)) return pick(R.inventory);
+  if(/^(hi|hey|hello|good\s*(morning|afternoon|evening)|howdy)\b/.test(t.trim())) return pick(R.greet);
   return pick(R.fallback);
 }
 
-// ── UI HELPERS ────────────────────────────────────────────────
-function setStatus(state, text) {
+// ── UI ────────────────────────────────────────────────────────
+function setStatus(state, text){
   sdot.className = state;
   stxt.textContent = text;
-  waveEl.classList.toggle('on', state === 'listening');
+  waveEl.classList.toggle('on', state==='listening');
 }
 
-function addMsg(role, html) {
+function addMsg(role, html){
   const wrap = document.createElement('div');
   wrap.className = `msg ${role}`;
-
   const av = document.createElement('div');
   av.className = 'ava';
-  av.textContent = role === 'alex' ? 'A' : '🙂';
-
+  av.textContent = role==='alex' ? 'A' : '🙂';
   const b = document.createElement('div');
   b.className = 'bub';
-  b.innerHTML = html
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\n/g,'<br>');
-
-  wrap.appendChild(av);
-  wrap.appendChild(b);
+  b.innerHTML = html.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  wrap.appendChild(av); wrap.appendChild(b);
   chatEl.appendChild(wrap);
   chatEl.scrollTop = chatEl.scrollHeight;
 }
 
-function showTyping() {
+function showTyping(){
+  removeTyping();
   const d = document.createElement('div');
-  d.className = 'msg alex'; d.id = 'typing-ind';
-  const av = document.createElement('div'); av.className = 'ava'; av.textContent = 'A';
-  const b = document.createElement('div'); b.className = 'bub typing-dots';
-  b.innerHTML = '<span></span><span></span><span></span>';
-  d.appendChild(av); d.appendChild(b);
-  chatEl.appendChild(d);
-  chatEl.scrollTop = chatEl.scrollHeight;
+  d.className='msg alex'; d.id='typ';
+  const av=document.createElement('div'); av.className='ava'; av.textContent='A';
+  const b=document.createElement('div'); b.className='bub tdots';
+  b.innerHTML='<span></span><span></span><span></span>';
+  d.appendChild(av); d.appendChild(b); chatEl.appendChild(d);
+  chatEl.scrollTop=chatEl.scrollHeight;
 }
-function hideTyping() { const e = document.getElementById('typing-ind'); if(e) e.remove(); }
+function removeTyping(){ const e=document.getElementById('typ'); if(e) e.remove(); }
 
-// ── SPEECH SYNTHESIS ──────────────────────────────────────────
-function speak(text, onDone) {
-  if (!('speechSynthesis' in window)) { if(onDone) onDone(); return; }
+// ── SPEECH SYNTHESIS — natural, never cuts out ───────────────
+function speakText(rawHtml, whenDone){
+  // Strip HTML tags for voice
+  const tmp = document.createElement('div');
+  tmp.innerHTML = rawHtml;
+  let plain = (tmp.textContent||tmp.innerText||'').replace(/\s+/g,' ').trim();
+
   window.speechSynthesis.cancel();
-  // Strip HTML for speech
-  const div = document.createElement('div');
-  div.innerHTML = text;
-  const plain = (div.textContent || div.innerText || '').replace(/\s+/g,' ').trim();
+  clearTimeout(resumeTimer);
 
   const u = new SpeechSynthesisUtterance(plain);
-  u.rate = 1.0; u.pitch = 1.06; u.volume = 1;
+  u.rate   = 0.97;   // slightly slower = more natural
+  u.pitch  = 1.05;
+  u.volume = 1;
 
+  // Pick the most natural voice available
   const voices = window.speechSynthesis.getVoices();
-  const chosen =
-    voices.find(v => /Samantha/i.test(v.name)) ||
-    voices.find(v => /Karen/i.test(v.name)) ||
-    voices.find(v => /Google US English/i.test(v.name)) ||
-    voices.find(v => /en-US/i.test(v.lang) && /female|woman/i.test(v.name)) ||
-    voices.find(v => /en-US/i.test(v.lang));
+  const preferred = [
+    'Samantha','Karen','Moira','Fiona',
+    'Google US English','Microsoft Aria','Microsoft Jenny',
+    'en-US-Neural','en-US'
+  ];
+  let chosen = null;
+  for(const name of preferred){
+    chosen = voices.find(v => v.name.includes(name) || v.lang === name);
+    if(chosen) break;
+  }
+  if(!chosen) chosen = voices.find(v => /en[-_]US/i.test(v.lang));
   if(chosen) u.voice = chosen;
 
-  u.onstart = () => { isSpeaking = true; setStatus('speaking','Alex is talking...'); };
-  u.onend   = () => { isSpeaking = false; setStatus(booking.active ? 'booking' : '', booking.active ? 'Booking in progress — reply to continue' : 'Ready — tap the mic or a quick action'); if(onDone) onDone(); };
-  u.onerror = () => { isSpeaking = false; setStatus('','Ready — tap the mic or a quick action'); if(onDone) onDone(); };
+  // Chrome bug fix: resume every 10s to prevent synthesis cutting out
+  function keepSynthAlive(){
+    clearTimeout(resumeTimer);
+    resumeTimer = setTimeout(()=>{
+      if(window.speechSynthesis.speaking){
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+        keepSynthAlive();
+      }
+    }, 10000);
+  }
+
+  u.onstart = ()=>{
+    alexTalking = true;
+    keepSynthAlive();
+    setStatus('speaking', 'Alex is talking...');
+  };
+
+  u.onend = ()=>{
+    alexTalking = false;
+    clearTimeout(resumeTimer);
+    if(whenDone) whenDone();
+    // Auto-resume listening if conversation is on
+    if(conversationOn){
+      setTimeout(()=> startListening(), 400);
+    }
+  };
+
+  u.onerror = ()=>{
+    alexTalking = false;
+    clearTimeout(resumeTimer);
+    if(whenDone) whenDone();
+    if(conversationOn) setTimeout(()=> startListening(), 400);
+  };
+
   window.speechSynthesis.speak(u);
 }
 
 // ── ALEX RESPONDS ─────────────────────────────────────────────
-function alexReply(userText) {
-  if (!userText.trim()) return;
+function alexReply(userText){
+  if(!userText.trim()) return;
   addMsg('user', userText);
   liveEl.textContent = '';
   showTyping();
 
-  // Faster response = more natural feel
-  const delay = 300 + Math.random() * 350;
-  setTimeout(() => {
-    hideTyping();
+  setTimeout(()=>{
+    removeTyping();
     const reply = getReply(userText);
     addMsg('alex', reply);
-    speak(reply);
-  }, delay);
+    speakText(reply);
+    setStatus(B.active ? 'booking' : 'speaking', 'Alex is talking...');
+  }, 280 + Math.random()*200);
 }
 
-function chip(text) {
-  if(isSpeaking) window.speechSynthesis.cancel();
+function chip(text){
+  window.speechSynthesis.cancel();
   alexReply(text);
 }
 
-// ── SPEECH RECOGNITION ────────────────────────────────────────
-function initSR() {
+// ── SPEECH RECOGNITION — continuous loop ──────────────────────
+function initSR(){
   const API = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!API) {
+  if(!API){
     micBtn.textContent = '⚠️  USE BUTTONS BELOW';
     micBtn.disabled = true;
-    setStatus('error','Voice not supported — try Chrome on desktop');
+    setStatus('error','Voice not supported — use Chrome on desktop');
     return;
   }
-
   SR = new API();
-  SR.continuous = true;
-  SR.interimResults = true;
-  SR.lang = 'en-US';
+  SR.continuous      = false;  // non-continuous = more reliable final results
+  SR.interimResults  = true;
+  SR.lang            = 'en-US';
   SR.maxAlternatives = 1;
 
-  SR.onstart = () => {
-    isListening = true;
-    micBtn.textContent = '🔴  STOP LISTENING';
-    micBtn.classList.add('on');
-    setStatus('listening','Listening... go ahead!');
+  SR.onstart = ()=>{
+    setStatus('listening', 'Listening... go ahead!');
   };
 
-  SR.onresult = (e) => {
-    let interim = '', final = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
+  SR.onresult = (e)=>{
+    let interim='', final='';
+    for(let i=e.resultIndex; i<e.results.length; i++){
       const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) final += t;
+      if(e.results[i].isFinal) final += t;
       else interim += t;
     }
     liveEl.textContent = interim || final || '';
 
-    if (final.trim()) {
+    if(final.trim()){
       clearTimeout(silenceTimer);
-      const captured = final.trim();
-      liveEl.textContent = '';
-      stopListening(false);
-      alexReply(captured);
-    } else if (interim.trim()) {
-      // Auto-submit after 1.8s of silence mid-speech (very natural feel)
+      liveEl.textContent='';
+      stopListening();
+      alexReply(final.trim());
+    } else if(interim.trim()){
       clearTimeout(silenceTimer);
-      silenceTimer = setTimeout(() => {
-        const captured = interim.trim();
-        if (captured.length > 2) {
-          liveEl.textContent = '';
-          stopListening(false);
-          alexReply(captured);
+      silenceTimer = setTimeout(()=>{
+        if(interim.trim().length > 1){
+          liveEl.textContent='';
+          stopListening();
+          alexReply(interim.trim());
         }
       }, 1800);
     }
   };
 
-  SR.onerror = (e) => {
-    stopListening(false);
-    if (e.error === 'no-speech') setStatus('','No speech detected — try again');
-    else if (e.error === 'not-allowed') setStatus('error','Mic blocked — check browser permissions');
-    else setStatus('error', `Mic error: ${e.error}`);
+  SR.onerror = (e)=>{
+    clearTimeout(silenceTimer);
+    if(e.error==='no-speech'){
+      // No speech — if conversation is on, restart listening quietly
+      if(conversationOn && !alexTalking){
+        setTimeout(()=> startListening(), 600);
+      }
+    } else if(e.error==='not-allowed'){
+      conversationOn = false;
+      updateMicBtn();
+      setStatus('error','Mic blocked — check browser permissions');
+    }
   };
 
-  SR.onend = () => {
-    if (isListening) {
-      isListening = false;
-      micBtn.textContent = '🎤 \u00A0 TALK TO ALEX';
-      micBtn.classList.remove('on');
+  SR.onend = ()=>{
+    // Only auto-restart if conversation mode is on AND alex isn't talking
+    if(conversationOn && !alexTalking){
+      setTimeout(()=> startListening(), 300);
     }
   };
 }
 
-function startListening() {
-  if(!SR) return;
-  if(isSpeaking) window.speechSynthesis.cancel();
-  try { SR.start(); } catch(e){}
+function startListening(){
+  if(!SR || alexTalking) return;
+  try{ SR.abort(); } catch(e){}
+  try{ SR.start(); } catch(e){}
 }
 
-function stopListening(updateUI = true) {
-  isListening = false;
-  clearTimeout(silenceTimer);
-  if(updateUI) {
-    micBtn.textContent = '🎤 \u00A0 TALK TO ALEX';
+function stopListening(){
+  try{ SR.stop(); } catch(e){}
+}
+
+function updateMicBtn(){
+  if(conversationOn){
+    micBtn.textContent = '🔴  END CONVERSATION';
+    micBtn.classList.add('on');
+  } else {
+    micBtn.textContent = '🎤  START TALKING TO ALEX';
     micBtn.classList.remove('on');
+    setStatus('', 'Tap the mic — then just talk naturally');
+    waveEl.classList.remove('on');
   }
-  try { SR.stop(); } catch(e){}
-  if(!isSpeaking) setStatus(
-    booking.active ? 'booking' : '',
-    booking.active ? 'Booking in progress — reply to continue' : 'Ready — tap the mic or a quick action below'
-  );
 }
 
-micBtn.addEventListener('click', () => {
-  if (isListening) stopListening();
-  else startListening();
+micBtn.addEventListener('click', ()=>{
+  conversationOn = !conversationOn;
+  updateMicBtn();
+  if(conversationOn){
+    window.speechSynthesis.cancel();
+    startListening();
+  } else {
+    stopListening();
+    window.speechSynthesis.cancel();
+    clearTimeout(silenceTimer);
+    clearTimeout(resumeTimer);
+  }
 });
 
-// Preload voices
-if ('speechSynthesis' in window) {
+// ── VOICE INIT — wait for voices to load ─────────────────────
+function initVoices(cb){
+  const voices = window.speechSynthesis.getVoices();
+  if(voices.length > 0){ cb(); return; }
+  window.speechSynthesis.onvoiceschanged = ()=>{ cb(); };
   window.speechSynthesis.getVoices();
-  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }
 
 // ── BOOT ──────────────────────────────────────────────────────
 initSR();
-setTimeout(() => {
-  const intro = pick(R.greet);
-  addMsg('alex', intro);
-  speak(intro);
-}, 700);
+initVoices(()=>{
+  setTimeout(()=>{
+    const intro = pick(R.greet);
+    addMsg('alex', intro);
+    speakText(intro);
+  }, 500);
+});
 </script>
 </body>
 </html>
