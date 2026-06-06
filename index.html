@@ -1,4 +1,528 @@
-onerror = () => { isSpeaking = false; setStatus('', 'Ready when you are'); };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alex — Your Car Dealership Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0e10;
+      --surface:   #111518;
+      --card:      #161b1f;
+      --border:    #1f2a30;
+      --green:     #00e676;
+      --green-dim: #00b85a;
+      --green-glow:#00e67640;
+      --red:       #ff4d6d;
+      --text:      #e8eff4;
+      --muted:     #5a7080;
+      --user-bg:   #0d2c1e;
+      --alex-bg:   #131e26;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      overflow: hidden;
+    }
+
+    /* ── BACKGROUND GRID ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 44px 44px;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 70% 55% at 50% 0%, #00e67614 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── LAYOUT ── */
+    #app {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column;
+      height: 100dvh; max-width: 680px;
+      margin: 0 auto;
+      padding: 0 0 env(safe-area-inset-bottom);
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 18px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #0e1316 0%, transparent 100%);
+      flex-shrink: 0;
+    }
+    .logo-ring {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 2px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 18px var(--green-glow);
+      flex-shrink: 0;
+      animation: pulse-ring 3s ease-in-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%,100% { box-shadow: 0 0 12px var(--green-glow); }
+      50%      { box-shadow: 0 0 28px var(--green-glow), 0 0 60px #00e67620; }
+    }
+    .header-text h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.5rem; font-weight: 700; letter-spacing: .04em;
+      line-height: 1.1;
+    }
+    .header-text h1 span { color: var(--green); }
+    .header-text p { font-size: 0.75rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .badge {
+      margin-left: auto;
+      background: var(--user-bg);
+      border: 1px solid var(--green-dim);
+      color: var(--green);
+      font-size: 0.65rem; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 99px;
+    }
+
+    /* ── CHAT ── */
+    #chat {
+      flex: 1; overflow-y: auto;
+      padding: 20px 20px 0;
+      display: flex; flex-direction: column; gap: 14px;
+      scroll-behavior: smooth;
+    }
+    #chat::-webkit-scrollbar { width: 4px; }
+    #chat::-webkit-scrollbar-track { background: transparent; }
+    #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    .msg {
+      display: flex; gap: 10px; align-items: flex-end;
+      animation: fadeUp .25s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(8px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .msg.user { flex-direction: row-reverse; }
+
+    .avatar {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+    .msg.alex .
+    avatar { background: var(--green); color: #000; font-weight: 700; font-family: 'Rajdhani', sans-serif; }
+    .msg.user .avatar { background: #1e3a4f; color: var(--muted); }
+
+    .bubble {
+      max-width: 80%; padding: 10px 15px; border-radius: 18px;
+      line-height: 1.55; font-size: 0.9rem;
+    }
+    .msg.alex .bubble {
+      background: var(--alex-bg); border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    .msg.user .bubble {
+      background: var(--user-bg); border: 1px solid #1a3d28;
+      border-bottom-right-radius: 4px; color: #c5f0d9;
+    }
+    .bubble strong { color: var(--green); font-weight: 500; }
+
+    /* ── STATUS BAR ── */
+    #status-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 24px;
+      font-size: 0.78rem; color: var(--muted);
+      min-height: 38px; flex-shrink: 0;
+    }
+    #status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--muted); flex-shrink: 0;
+      transition: background .3s;
+    }
+    #status-dot.listening { background: var(--green); animation: blink .7s ease infinite alternate; }
+    #status-dot.speaking  { background: #40c4ff; animation: blink .9s ease infinite alternate; }
+    #status-dot.error     { background: var(--red); }
+    @keyframes blink { from { opacity:1; } to { opacity:.3; } }
+
+    /* ── CONTROLS ── */
+    #controls {
+      padding: 12px 20px 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      flex-shrink: 0;
+    }
+
+    #mic-btn {
+      width: 100%; max-width: 420px;
+      padding: 0; height: 66px;
+      background: linear-gradient(135deg, var(--green-dim), var(--green));
+      border: none; border-radius: 14px; cursor: pointer;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.2rem; font-weight: 700; letter-spacing: .06em;
+      color: #000;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 0 32px var(--green-glow), 0 4px 20px #00000060;
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+      position: relative; overflow: hidden;
+    }
+    #mic-btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #ffffff22, transparent);
+      pointer-events: none;
+    }
+    #mic-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 44px var(--green-glow), 0 8px 28px #00000080; }
+    #mic-btn:active:not(:disabled) { transform: translateY(0); }
+    #mic-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    #mic-btn.listening {
+      background: linear-gradient(135deg, #c62828, var(--red));
+      box-shadow: 0 0 32px #ff4d6d40, 0 4px 20px #00000060;
+    }
+
+    .quick-chips {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 7px;
+      max-width: 480px;
+    }
+    .chip {
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--muted); font-size: 0.72rem; letter-spacing: .03em;
+      padding: 5px 12px; border-radius: 99px; cursor: pointer;
+      transition: border-color .2s, color .2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .chip:hover { border-color: var(--green-dim); color: var(--green); }
+
+    /* ── TYPING DOTS ── */
+    .typing { display: flex; align-items: center; gap: 5px; padding: 10px 15px; }
+    .typing span {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--muted);
+      animation: bounce .9s ease infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: .15s; }
+    .typing span:nth-child(3) { animation-delay: .30s; }
+    @keyframes bounce { 0%,80%,100%{ transform:scale(1) } 40%{ transform:scale(1.5) } }
+
+    /* ── WAVEFORM ── */
+    #waveform {
+      display: flex; align-items: center; gap: 3px; height: 20px;
+      opacity: 0; transition: opacity .3s;
+    }
+    #waveform.active { opacity: 1; }
+    #waveform .bar {
+      width: 3px; border-radius: 99px;
+      background: var(--green);
+      animation: wave 1.1s ease-in-out infinite;
+    }
+    #waveform .
+    bar:nth-child(1) { animation-delay:0s;    height: 8px; }
+    #waveform .bar:nth-child(2) { animation-delay:.12s;  height: 14px; }
+    #waveform .bar:nth-child(3) { animation-delay:.24s;  height: 20px; }
+    #waveform .bar:nth-child(4) { animation-delay:.12s;  height: 14px; }
+    #waveform .bar:nth-child(5) { animation-delay:0s;    height: 8px; }
+    @keyframes wave {
+      0%,100% { transform: scaleY(1); }
+      50%      { transform: scaleY(.4); }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="logo-ring">🚗</div>
+    <div class="header-text">
+      <h1>Meet <span>Alex</span></h1>
+      <p>Your AI Car Specialist</p>
+    </div>
+    <div class="badge">Voice AI</div>
+  </header>
+
+  <div id="chat"></div>
+
+  <div id="status-bar">
+    <div id="status-dot"></div>
+    <span id="status-text">Ready when you are</span>
+    <div id="waveform">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="bar"></div><div class="bar"></div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button id="mic-btn">🎤 Talk to Alex Now</button>
+    <div class="quick-chips">
+      <div class="chip" onclick="askChip('What cars do you have?')">🚘 View Inventory</div>
+      <div class="chip" onclick="askChip('Book a test drive')">📅 Test Drive</div>
+      <div class="chip" onclick="askChip('Tell me about electric cars')">⚡ EVs</div>
+      <div class="chip" onclick="askChip('What are your truck options?')">🛻 Trucks</div>
+      <div class="chip" onclick="askChip('Tell me about the Mustang')">🐎 Mustang</div>
+      <div class="chip" onclick="askChip('What financing options do you offer?')">💳 Finance</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  ALEX — Car Dealership Voice Assistant
+// ═══════════════════════════════════════════════
+
+const chatEl    = document.getElementById('chat');
+const micBtn    = document.getElementById('mic-btn');
+const statusDot = document.getElementById('status-dot');
+const statusTxt = document.getElementById('status-text');
+const waveform  = document.getElementById('waveform');
+
+let recognition  = null;
+let isListening  = false;
+let isSpeaking   = false;
+
+// ── Knowledge Base ──────────────────────────────
+const KB = {
+  inventory: {
+    sedans:    ['Honda Civic ($23,500)', 'Toyota Camry ($27,900)', 'Hyundai Sonata ($26,400)'],
+    suvs:      ['Ford Explorer ($42,000)', 'Chevy Equinox ($33,500)', 'Toyota RAV4 ($31,200)', 'Kia Sportage ($29,800)'],
+    trucks:    ['Ford F-150 ($39,000)', 'Chevy Silverado ($41,500)', 'Ram 1500 ($43,200)', 'Toyota Tacoma ($35,000)'],
+    electric:  ['Tesla Model 3 ($41,990)', 'Chevy Bolt EV ($26,500)', 'Ford Mustang Mach-E ($42,995)', 'Hyundai Ioniq 6 ($38,615)'],
+    mustang:   ['Ford Mustang EcoBoost ($32,515)', 'Ford Mustang GT ($42,515)', 'Ford Mustang Dark Horse ($57,970)', 'Ford Mustang Mach-E (Electric, $42,995)'],
+    luxury:    ['BMW 3 Series ($44,900)', 'Mercedes C-Class ($47,200)', 'Audi Q5 ($45,000)'],
+  },
+  hours:     'Mon–Sat 9 AM – 8 PM, Sun 11 AM – 5 PM',
+  address:   '1200 Auto Drive, Motorville',
+  phone:     '(555) 280-4100',
+  financing: '0% APR for 36 months on select models, 60-month and 72-month terms available, trade-in credit up to $5,000, easy online pre-approval',
+  testDrive: 'online at alexautomotive.com/test-drive or by calling (555) 280-4100',
+};
+
+// ── Response Engine ─────────────────────────────
+function getResponse(input) {
+  const t = input.toLowerCase();
+
+  // Greetings
+  if (/^(hi|hey|hello|good\s*(morning|afternoon|evening)|howdy|sup)\b/.test(t))
+    return Hey there! I'm Alex — your personal car guide here at Alex Automotive. Whether you're after a sleek sedan, a rugged truck, or something fully electric, I've got the inside scoop. What can I help you find today?;
+
+  // Inventory — general
+  if (/what.*(car|vehicle|model|option|inventory|stock|sell|have|available)/.test(t) && !/truck|electric|ev|mustang|suv|sedan|luxury/.test(t))
+    return Great question! Here's what we've got on the lot right now:\n• **Sedans**: ${KB.inventory.sedans.
+    join(', ')}\n• **SUVs**: ${KB.inventory.suvs.slice(0,3).join(', ')}\n• **Trucks**: ${KB.inventory.trucks.slice(0,3).join(', ')}\n• **Electric**: ${KB.inventory.electric.slice(0,3).join(', ')}\n\nSee anything that sparks your interest?;
+
+  // Trucks
+  if (/truck|pickup|f.?150|silverado|ram 1500|tacoma|f150/.test(t))
+    return Oh, we love trucks here! Our current lineup includes: ${KB.inventory.trucks.join(', ')}. The F-150 is our best-seller — incredibly versatile. The Ram 1500 has that luxury cabin feel if you want premium comfort. Want to book a test drive for any of these?;
+
+  // Electric / EV
+  if (/electric|ev|bolt|ioniq|mach.?e|tesla|zero emission|plug.?in|charge/.test(t))
+    return Going electric? Smart move! Here's our EV lineup: ${KB.inventory.electric.join(', ')}. The Chevy Bolt is our best value EV, and the Mustang Mach-E is a crowd favourite for its range and style. Need details on charging, range, or tax credits?;
+
+  // Mustang
+  if (/mustang/.test(t))
+    return Ah, a person of culture! 🐎 The Mustang lineup is legendary. Here's what we have: ${KB.inventory.mustang.join(', ')}. The GT is pure V8 joy, the Dark Horse is track-ready beast mode, and the Mach-E is the electric future. Which one's calling your name?;
+
+  // SUVs
+  if (/suv|crossover|explorer|equinox|rav4|sportage/.test(t))
+    return SUVs are super popular right now — and for good reason! Our selection: ${KB.inventory.suvs.join(', ')}. The RAV4 is our top-seller for reliability, and the Explorer is awesome if you need more space. Want me to narrow it down by budget or family size?;
+
+  // Sedans
+  if (/sedan|civic|camry|sonata|four.?door/.test(t))
+    return Classic and practical! Our sedan lineup: ${KB.inventory.sedans.join(', ')}. The Civic is fantastic value, and the Camry is practically bulletproof in terms of reliability. Any of those catch your eye?;
+
+  // Luxury
+  if (/luxury|premium|bmw|mercedes|audi|high.?end/.test(t))
+    return Ready to treat yourself? Our luxury selection: ${KB.inventory.luxury.join(', ')}. Each one comes with a premium experience from purchase to service. Want to schedule a private viewing?;
+
+  // Test drive
+  if (/test.?drive|test drive|drive it|try.*(car|it)/.test(t))
+    return Absolutely — nothing beats getting behind the wheel! You can book a test drive ${KB.testDrive}. We're available ${KB.hours}. Which vehicle were you thinking of taking for a spin?;
+
+  // Price / cost
+  if (/price|cost|how much|expensive|cheap|afford|budget|payment/.test(t))
+    return Prices vary across our inventory — from the Chevy Bolt EV at around $26,500 all the way up to luxury trims above $50K. We also have **${KB.financing}**. Want me to find options that match a specific budget?;
+
+  // Financing / trade-in
+  if (/financ|loan|apr|monthly|trade.?in|credit|down payment|pre.?approv/.test(t))
+    return We make financing easy! We offer **${KB.financing}**. Our finance team can usually get you an answer within minutes. Want to come in for a consultation, or would you prefer to start online?;
+
+  // Hours
+  if (/hour|open|close|when|schedule|time/.test(t))
+    return We're open **${KB.hours}**. Walk-ins are always welcome, but if you want guaranteed one-on-one time with our team, booking an appointment is the way to go. Can I help you set one up?;
+
+  // Location / address / directions
+  if (/where|location|address|find you|directions|map/.test(t))
+    return You can find us at **${KB.address}**. We're easy to spot — look for the giant Alex Auto sign! Need turn-by-turn directions or want me to pull up the address on maps?;
+
+  // Contact / phone
+  if (/phone|call|contact|number|reach/.test(t))
+    return You can reach us at **${KB.phone}** or drop by ${KB.address}. Our team is available ${KB.hours}. Want me to help you book an appointment right now?;
+
+  // Safety / warranty / reliability
+  if (/safe|warranty|reliable|recall|trust|dependable/.test(t))
+    return Great thing to consider! Most of our vehicles come with manufacturer warranties ranging from 3 to 10 years. We also offer extended warranty plans and certified pre-owned options.join(', ')}\n• **SUVs**: ${KB.inventory.suvs.slice(0,3).join(', ')}\n• **Trucks**: ${KB.inventory.trucks.slice(0,3).join(', ')}\n• **Electric**: ${KB.inventory.electric.slice(0,3).join(', ')}\n\nSee anything that sparks your interest?;
+
+  // Trucks
+  if (/truck|pickup|f.?150|silverado|ram 1500|tacoma|f150/.test(t))
+    return Oh, we love trucks here! Our current lineup includes: ${KB.inventory.trucks.join(', ')}. The F-150 is our best-seller — incredibly versatile. The Ram 1500 has that luxury cabin feel if you want premium comfort. Want to book a test drive for any of these?;
+
+  // Electric / EV
+  if (/electric|ev|bolt|ioniq|mach.?e|tesla|zero emission|plug.?in|charge/.test(t))
+    return Going electric? Smart move! Here's our EV lineup: ${KB.inventory.electric.join(', ')}. The Chevy Bolt is our best value EV, and the Mustang Mach-E is a crowd favourite for its range and style. Need details on charging, range, or tax credits?;
+
+  // Mustang
+  if (/mustang/.test(t))
+    return Ah, a person of culture! 🐎 The Mustang lineup is legendary. Here's what we have: ${KB.inventory.mustang.join(', ')}. The GT is pure V8 joy, the Dark Horse is track-ready beast mode, and the Mach-E is the electric future. Which one's calling your name?;
+
+  // SUVs
+  if (/suv|crossover|explorer|equinox|rav4|sportage/.test(t))
+    return SUVs are super popular right now — and for good reason! Our selection: ${KB.inventory.suvs.join(', ')}. The RAV4 is our top-seller for reliability, and the Explorer is awesome if you need more space. Want me to narrow it down by budget or family size?;
+
+  // Sedans
+  if (/sedan|civic|camry|sonata|four.?door/.test(t))
+    return Classic and practical! Our sedan lineup: ${KB.inventory.sedans.join(', ')}. The Civic is fantastic value, and the Camry is practically bulletproof in terms of reliability. Any of those catch your eye?;
+
+  // Luxury
+  if (/luxury|premium|bmw|mercedes|audi|high.?end/.test(t))
+    return Ready to treat yourself? Our luxury selection: ${KB.inventory.luxury.join(', ')}. Each one comes with a premium experience from purchase to service. Want to schedule a private viewing?;
+
+  // Test drive
+  if (/test.?drive|test drive|drive it|try.*(car|it)/.test(t))
+    return Absolutely — nothing beats getting behind the wheel! You can book a test drive ${KB.testDrive}. We're available ${KB.hours}. Which vehicle were you thinking of taking for a spin?;
+
+  // Price / cost
+  if (/price|cost|how much|expensive|cheap|afford|budget|payment/.test(t))
+    return Prices vary across our inventory — from the Chevy Bolt EV at around $26,500 all the way up to luxury trims above $50K. We also have **${KB.financing}**. Want me to find options that match a specific budget?;
+
+  // Financing / trade-in
+  if (/financ|loan|apr|monthly|trade.?in|credit|down payment|pre.?approv/.test(t))
+    return We make financing easy! We offer **${KB.financing}**. Our finance team can usually get you an answer within minutes. Want to come in for a consultation, or would you prefer to start online?;
+
+  // Hours
+  if (/hour|open|close|when|schedule|time/.test(t))
+    return We're open **${KB.hours}**. Walk-ins are always welcome, but if you want guaranteed one-on-one time with our team, booking an appointment is the way to go. Can I help you set one up?;
+
+  // Location / address / directions
+  if (/where|location|address|find you|directions|map/.test(t))
+    return You can find us at **${KB.address}**. We're easy to spot — look for the giant Alex Auto sign! Need turn-by-turn directions or want me to pull up the address on maps?;
+
+  // Contact / phone
+  if (/phone|call|contact|number|reach/.test(t))
+    return You can reach us at **${KB.phone}** or drop by ${KB.address}. Our team is available ${KB.hours}. Want me to help you book an appointment right now?;
+
+  // Safety / warranty / reliability
+  if (/safe|warranty|reliable|recall|trust|dependable/.test(t))
+    return Great thing to consider! Most of our vehicles come with manufacturer warranties ranging from 3 to 10 years. We also offer extended warranty plans and certified pre-owned options.
+    Safety ratings are posted for every model in our showroom. Which car are you researching?;
+
+  // Bye / thanks
+  if (/bye|goodbye|thank|thanks|cheers|later|see ya/.test(t))
+    return It was a pleasure chatting with you! 🚗 Come on in anytime — Alex Automotive at ${KB.address}. We'll find you the perfect ride. See you soon!;
+
+  // Joke / fun
+  if (/joke|funny|laugh|humor/.test(t))
+    return Ha! Okay, here's one: Why did the car break up with the mechanic? Because he kept taking her for granted! 😄 Now — ready to find a car that'll never let you down?;
+
+  // Comparison
+  if (/compare|vs|versus|difference|better|which one/.test(t))
+    return Happy to help you compare! Tell me the two (or more) models you're weighing and I'll break down the key differences — price, features, fuel economy, whatever matters most to you.;
+
+  // Color / exterior
+  if (/color|colour|red|black|white|blue|silver|paint/.test(t))
+    return Most of our models come in a great range of colors — from classic whites and blacks to bold reds and blues. Exact availability depends on the trim. Let me know which model you have in mind and I can check what we have in stock!;
+
+  // Default
+  const defaults = [
+    That's a great question! I specialize in helping you find the perfect car, book test drives, and explore financing. Could you tell me more about what you're looking for?,
+    Hmm, let me make sure I understand — are you asking about a specific car, pricing, or something else? I'm here to help!,
+    I want to give you the best answer possible! Could you rephrase that, or ask me about our inventory, test drives, pricing, or financing?,
+    Good one! I'm still learning every day. Try asking me about specific models, trucks, EVs, the Mustang, or how to book a test drive — I love those topics!,
+  ];
+  return defaults[Math.floor(Math.random() * defaults.length)];
+}
+
+// ── UI Helpers ──────────────────────────────────
+function setStatus(state, text) {
+  statusDot.className = state;
+  statusTxt.textContent = text;
+  waveform.classList.toggle('active', state === 'listening');
+}
+
+function addMessage(role, text) {
+  const div = document.createElement('div');
+  div.className = msg ${role};
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = role === 'alex' ? 'A' : '🙂';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  chatEl.appendChild(div);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function addTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg alex';
+  div.id = 'typing-indicator';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = 'A';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble typing';
+  bubble.innerHTML = '<span></span><span></span><span></span>';
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  chatEl.appendChild(div);
+  chatEl.scrollTop = chatEl.scrollHeight;
+  return div;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+// ── Speech Synthesis ────────────────────────────
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+
+  const plain = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/<br>/g, ' ').replace(/•/g, '');
+  const utter = new SpeechSynthesisUtterance(plain);
+  utter.rate  = 1.05;
+  utter.pitch = 1.05;
+  utter.volume = 1;
+
+  // Pick a good voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v =>
+    /Samantha|Karen|Google US English|en-US/i.test(v.name + v.lang)
+  );
+  if (preferred) utter.voice = preferred;
+
+  utter.onstart = () => { isSpeaking = true;  setStatus('speaking', 'Alex is speaking…'); };
+  utter.onend   = () => { isSpeaking = false; setStatus('', 'Ready when you are'); };
+  utter.
+    onerror = () => { isSpeaking = false; setStatus('', 'Ready when you are'); };
 
   window.speechSynthesis.speak(utter);
 }
