@@ -1,98 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alex - Dealership AI Wingman</title>
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; text-align: center; background: linear-gradient(#0a0a0a, #1a1a1a); color: white; padding: 20px; margin: 0; }
-    h1 { color: #00ff88; margin-bottom: 10px; }
-    p { max-width: 600px; margin: 0 auto 20px; }
-    #chat { height: 420px; overflow-y: auto; border: 2px solid #00ff88; padding: 15px; margin: 20px auto; max-width: 600px; border-radius: 20px; background: #111; display: flex; flex-direction: column; }
-    button { padding: 18px 40px; font-size: 20px; background: #00ff88; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; margin: 10px; width: 80%; max-width: 400px; }
-    button:hover { background: #00cc6a; transform: scale(1.05); }
-    .message { margin: 12px 0; padding: 12px 18px; border-radius: 20px; max-width: 80%; }
-    .user { background: #00ff88; color: black; align-self: flex-end; }
-    .ai { background: #333; align-self: flex-start; }
-    #status { color: #ffcc00; margin: 10px; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <h1>🚗 Alex - Dealership AI</h1>
-  <p>Speak naturally: "Book me a test drive Saturday" or "What's the price on that Mustang?"</p>
-  <button onclick="startVoice()">🎤 Talk to Alex Now</button>
-  <div id="status"></div>
-  <div id="chat"></div>
+onerror = () => { isSpeaking = false; setStatus('', 'Ready when you are'); };
 
-  <script>
-    const chat = document.getElementById('chat');
-    const status = document.getElementById('status');
-    let recognition;
+  window.speechSynthesis.speak(utter);
+}
 
-    function showStatus(msg, color = '#ffcc00') {
-      status.textContent = msg;
-      status.style.color = color;
-      setTimeout(() => status.textContent = '', 5000);
+// ── Alex Responds ───────────────────────────────
+function alexRespond(userText) {
+  if (!userText.trim()) return;
+  addMessage('user', userText);
+
+  const typing = addTyping();
+  const delay = 600 + Math.random() * 400;
+
+  setTimeout(() => {
+    removeTyping();
+    const reply = getResponse(userText);
+    addMessage('alex', reply);
+    speak(reply);
+  }, delay);
+}
+
+// ── Chip shortcuts ──────────────────────────────
+function askChip(text) {
+  if (isSpeaking) window.speechSynthesis.cancel();
+  alexRespond(text);
+}
+
+// ── Speech Recognition ──────────────────────────
+function initRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    micBtn.textContent = '⚠️ Browser Not Supported';
+    micBtn.disabled = true;
+    setStatus('error', 'Try Chrome on desktop or Android');
+    return;
+  }
+
+  recognition = new SR();
+  recognition.continuous  = false;
+  recognition.interimResults = true;
+  recognition.lang        = 'en-US';
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.textContent = '🔴 Stop Listening';
+    micBtn.classList.add('listening');
+    setStatus('listening', 'Listening… speak now');
+  };
+
+  recognition.onresult = (e) => {
+    const transcript = Array.from(e.results)
+      .map(r => r[0].transcript).join('');
+    if (e.results[e.results.length - 1].isFinal) {
+      stopListening();
+      alexRespond(transcript);
     }
+  };
 
-    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.lang = 'en-US';
-      recognition.onresult = handleVoiceInput;
-      recognition.onerror = (e) => showStatus("Mic error: " + e.error + " — try Chrome", "red");
-    } else {
-      showStatus("Voice not supported here — use Chrome", "red");
-    }
+  recognition.onerror = (e) => {
+    stopListening();
+    if (e.error === 'no-speech')  setStatus('', 'No speech detected — try again');
+    else if (e.error === 'not-allowed') setStatus('error', 'Microphone access denied');
+    else setStatus('error', `Error: ${e.error}`);
+  };
 
-    async function startVoice() {
-      if (!recognition) {
-        showStatus("Use Chrome browser for voice 🔥");
-        return;
-      }
-      try {
-        showStatus("Listening... Speak now!");
-        recognition.start();
-      } catch (err) {
-        showStatus("Couldn't start mic — allow permission & try Chrome");
-      }
-    }
+  recognition.onend = () => { if (isListening) stopListening(); };
+}
 
-    async function handleVoiceInput(event) {
-      const transcript = event.results[0][0].transcript;
-      addMessage("You: " + transcript, 'user');
+function startListening() {
+  if (!recognition) return;
+  if (isSpeaking) window.speechSynthesis.cancel();
+  try { recognition.start(); }
+  catch(e) { /* already started */ }
+}
 
-      const response = await getSmartResponse(transcript);
-      addMessage("Alex: " + response, 'ai');
+function stopListening() {
+  isListening = false;
+  micBtn.textContent = '🎤 Talk to Alex Now';
+  micBtn.classList.remove('listening');
+  try { recognition.stop(); } catch(e) {}
+  if (!isSpeaking) setStatus('', 'Ready when you are');
+}
 
-      const utterance = new SpeechSynthesisUtterance(response);
-      utterance.rate = 1.05;
-      speechSynthesis.speak(utterance);
-      showStatus("✅ Responded!");
-    }
+micBtn.addEventListener('click', () => {
+  if (isListening) stopListening();
+  else startListening();
+});
 
-    function addMessage(text, type) {
-      const msg = document.createElement('div');
-      msg.className = message ${type};
-      msg.textContent = text;
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
-    }
+// ── Load voices async ───────────────────────────
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.getVoices(); // warm up
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
 
-    async function getSmartResponse(input) {
-      const lower = input.toLowerCase();
-      if (lower.includes("book")  lower.includes("appointment")  lower.includes("test drive") || lower.includes("schedule")) {
-        return "Hell yeah! What's your name and best day/time this week? We've got sweet deals — let's get you behind the wheel 😎";
-      }
-      if (lower.includes("price")  lower.includes("how much")  lower.includes("cost")) {
-        return "Mustangs start around $35k with easy financing. Want a custom quote?";
-      }
-      if (lower.includes("hello")  lower.includes("hi")  lower.includes("hey")) {
-        return "What's good? Ready to drive something fun today? 😏";
-      }
-      return "Haha, I like your vibe. Tell me more — sports car, truck, or electric?";
-      }
-  </script>
+// ── Boot ────────────────────────────────────────
+initRecognition();
+
+setTimeout(() => {
+  addMessage('alex', `Hey, welcome to Alex Automotive! 🚗 I'm Alex — your AI-powered car specialist. Whether you're after a truck, an EV, the iconic Mustang, or just want to explore your options, I'm here to help. What are you looking for today?`);
+  speak(`Hey, welcome to Alex Automotive! I'm Alex, your car specialist. What kind of vehicle are you looking for today?`);
+}, 500);
+</script>
 </body>
 </html>
