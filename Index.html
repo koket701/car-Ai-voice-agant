@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alex - Dealership AI Wingman</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; text-align: center; background: linear-gradient(#0a0a0a, #1a1a1a); color: white; padding: 20px; margin: 0; }
+    h1 { color: #00ff88; margin-bottom: 10px; }
+    p { max-width: 600px; margin: 0 auto 20px; }
+    #chat { height: 420px; overflow-y: auto; border: 2px solid #00ff88; padding: 15px; margin: 20px auto; max-width: 600px; border-radius: 20px; background: #111; display: flex; flex-direction: column; }
+    button { padding: 18px 40px; font-size: 20px; background: #00ff88; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; margin: 10px; }
+    button:hover { background: #00cc6a; transform: scale(1.05); transition: all 0.2s; }
+    .message { margin: 12px 0; padding: 12px 18px; border-radius: 20px; max-width: 80%; }
+    .user { background: #00ff88; color: black; align-self: flex-end; }
+    .ai { background: #333; align-self: flex-start; }
+  </style>
+</head>
+<body>
+  <h1>🚗 Alex - Dealership AI</h1>
+  <p>Speak naturally: "Book me a test drive Saturday" or "What's the price on that Mustang?"</p>
+  <button onclick="startVoice()">🎤 Talk to Alex Now</button>
+  <div id="chat"></div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    let recognition;
+
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+      recognition.onresult = handleVoiceInput;
+    }
+
+    function addMessage(text, type) {
+      const msg = document.createElement('div');
+      msg.className = message ${type};
+      msg.textContent = text;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function startVoice() {
+      if (!recognition) return alert("Use Chrome for full voice magic 🔥");
+      recognition.start();
+    }
+
+    async function handleVoiceInput(event) {
+      const transcript = event.results[0][0].transcript;
+      addMessage("You: " + transcript, 'user');
+
+      const response = await getSmartResponse(transcript);
+      addMessage("Alex: " + response, 'ai');
+
+      const utterance = new SpeechSynthesisUtterance(response);
+      utterance.rate = 1.05;
+      speechSynthesis.speak(utterance);
+    }
+
+    async function getSmartResponse(input) {
+      const lower = input.toLowerCase();
+      if (lower.includes("book")  lower.includes("appointment")  lower.includes("test drive") || lower.includes("schedule")) {
+        return "Hell yeah! What's your name and best day/time this week? We've got sweet deals — let's get you behind the wheel 😎";
+      }
+      if (lower.includes("price")  lower.includes("how much")  lower.includes("cost")) {
+        return "Mustangs start around $35k with easy financing. Want a custom quote?";
+      }
+      if (lower.includes("hello")  lower.includes("hi")  lower.includes("hey")) {
+        return "What's good? Ready to drive something fun today? 😏";
+      }
+      return "Haha, I like your vibe. Tell me more — sports car, truck, or electric?";
+    }
+  </script>
+</body>
+</html>
