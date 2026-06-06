@@ -123,8 +123,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 13px;
     }
-    .msg.alex .
-    avatar { background: var(--green); color: #000; font-weight: 700; font-family: 'Rajdhani', sans-serif; }
+    .msg.alex .avatar { background: var(--green); color: #000; font-weight: 700; font-family: 'Rajdhani', sans-serif; }
     .msg.user .avatar { background: #1e3a4f; color: var(--muted); }
 
     .bubble {
@@ -226,8 +225,7 @@
       background: var(--green);
       animation: wave 1.1s ease-in-out infinite;
     }
-    #waveform .
-    bar:nth-child(1) { animation-delay:0s;    height: 8px; }
+    #waveform .bar:nth-child(1) { animation-delay:0s;    height: 8px; }
     #waveform .bar:nth-child(2) { animation-delay:.12s;  height: 14px; }
     #waveform .bar:nth-child(3) { animation-delay:.24s;  height: 20px; }
     #waveform .bar:nth-child(4) { animation-delay:.12s;  height: 14px; }
@@ -313,140 +311,86 @@ function getResponse(input) {
 
   // Greetings
   if (/^(hi|hey|hello|good\s*(morning|afternoon|evening)|howdy|sup)\b/.test(t))
-    return Hey there! I'm Alex — your personal car guide here at Alex Automotive. Whether you're after a sleek sedan, a rugged truck, or something fully electric, I've got the inside scoop. What can I help you find today?;
+    return `Hey there! I'm Alex — your personal car guide here at Alex Automotive. Whether you're after a sleek sedan, a rugged truck, or something fully electric, I've got the inside scoop. What can I help you find today?`;
 
   // Inventory — general
   if (/what.*(car|vehicle|model|option|inventory|stock|sell|have|available)/.test(t) && !/truck|electric|ev|mustang|suv|sedan|luxury/.test(t))
-    return Great question! Here's what we've got on the lot right now:\n• **Sedans**: ${KB.inventory.sedans.
-    join(', ')}\n• **SUVs**: ${KB.inventory.suvs.slice(0,3).join(', ')}\n• **Trucks**: ${KB.inventory.trucks.slice(0,3).join(', ')}\n• **Electric**: ${KB.inventory.electric.slice(0,3).join(', ')}\n\nSee anything that sparks your interest?;
+    return `Great question! Here's what we've got on the lot right now:\n• **Sedans**: ${KB.inventory.sedans.join(', ')}\n• **SUVs**: ${KB.inventory.suvs.slice(0,3).join(', ')}\n• **Trucks**: ${KB.inventory.trucks.slice(0,3).join(', ')}\n• **Electric**: ${KB.inventory.electric.slice(0,3).join(', ')}\n\nSee anything that sparks your interest?`;
 
   // Trucks
   if (/truck|pickup|f.?150|silverado|ram 1500|tacoma|f150/.test(t))
-    return Oh, we love trucks here! Our current lineup includes: ${KB.inventory.trucks.join(', ')}. The F-150 is our best-seller — incredibly versatile. The Ram 1500 has that luxury cabin feel if you want premium comfort. Want to book a test drive for any of these?;
+    return `Oh, we love trucks here! Our current lineup includes: ${KB.inventory.trucks.join(', ')}. The F-150 is our best-seller — incredibly versatile. The Ram 1500 has that luxury cabin feel if you want premium comfort. Want to book a test drive for any of these?`;
 
   // Electric / EV
   if (/electric|ev|bolt|ioniq|mach.?e|tesla|zero emission|plug.?in|charge/.test(t))
-    return Going electric? Smart move! Here's our EV lineup: ${KB.inventory.electric.join(', ')}. The Chevy Bolt is our best value EV, and the Mustang Mach-E is a crowd favourite for its range and style. Need details on charging, range, or tax credits?;
+    return `Going electric? Smart move! Here's our EV lineup: ${KB.inventory.electric.join(', ')}. The Chevy Bolt is our best value EV, and the Mustang Mach-E is a crowd favourite for its range and style. Need details on charging, range, or tax credits?`;
 
   // Mustang
   if (/mustang/.test(t))
-    return Ah, a person of culture! 🐎 The Mustang lineup is legendary. Here's what we have: ${KB.inventory.mustang.join(', ')}. The GT is pure V8 joy, the Dark Horse is track-ready beast mode, and the Mach-E is the electric future. Which one's calling your name?;
+    return `Ah, a person of culture! 🐎 The Mustang lineup is legendary. Here's what we have: ${KB.inventory.mustang.join(', ')}. The GT is pure V8 joy, the Dark Horse is track-ready beast mode, and the Mach-E is the electric future. Which one's calling your name?`;
 
   // SUVs
   if (/suv|crossover|explorer|equinox|rav4|sportage/.test(t))
-    return SUVs are super popular right now — and for good reason! Our selection: ${KB.inventory.suvs.join(', ')}. The RAV4 is our top-seller for reliability, and the Explorer is awesome if you need more space. Want me to narrow it down by budget or family size?;
+    return `SUVs are super popular right now — and for good reason! Our selection: ${KB.inventory.suvs.join(', ')}. The RAV4 is our top-seller for reliability, and the Explorer is awesome if you need more space. Want me to narrow it down by budget or family size?`;
 
   // Sedans
   if (/sedan|civic|camry|sonata|four.?door/.test(t))
-    return Classic and practical! Our sedan lineup: ${KB.inventory.sedans.join(', ')}. The Civic is fantastic value, and the Camry is practically bulletproof in terms of reliability. Any of those catch your eye?;
+    return `Classic and practical! Our sedan lineup: ${KB.inventory.sedans.join(', ')}. The Civic is fantastic value, and the Camry is practically bulletproof in terms of reliability. Any of those catch your eye?`;
 
   // Luxury
   if (/luxury|premium|bmw|mercedes|audi|high.?end/.test(t))
-    return Ready to treat yourself? Our luxury selection: ${KB.inventory.luxury.join(', ')}. Each one comes with a premium experience from purchase to service. Want to schedule a private viewing?;
+    return `Ready to treat yourself? Our luxury selection: ${KB.inventory.luxury.join(', ')}. Each one comes with a premium experience from purchase to service. Want to schedule a private viewing?`;
 
   // Test drive
   if (/test.?drive|test drive|drive it|try.*(car|it)/.test(t))
-    return Absolutely — nothing beats getting behind the wheel! You can book a test drive ${KB.testDrive}. We're available ${KB.hours}. Which vehicle were you thinking of taking for a spin?;
+    return `Absolutely — nothing beats getting behind the wheel! You can book a test drive ${KB.testDrive}. We're available ${KB.hours}. Which vehicle were you thinking of taking for a spin?`;
 
   // Price / cost
   if (/price|cost|how much|expensive|cheap|afford|budget|payment/.test(t))
-    return Prices vary across our inventory — from the Chevy Bolt EV at around $26,500 all the way up to luxury trims above $50K. We also have **${KB.financing}**. Want me to find options that match a specific budget?;
+    return `Prices vary across our inventory — from the Chevy Bolt EV at around $26,500 all the way up to luxury trims above $50K. We also have **${KB.financing}**. Want me to find options that match a specific budget?`;
 
   // Financing / trade-in
   if (/financ|loan|apr|monthly|trade.?in|credit|down payment|pre.?approv/.test(t))
-    return We make financing easy! We offer **${KB.financing}**. Our finance team can usually get you an answer within minutes. Want to come in for a consultation, or would you prefer to start online?;
+    return `We make financing easy! We offer **${KB.financing}**. Our finance team can usually get you an answer within minutes. Want to come in for a consultation, or would you prefer to start online?`;
 
   // Hours
   if (/hour|open|close|when|schedule|time/.test(t))
-    return We're open **${KB.hours}**. Walk-ins are always welcome, but if you want guaranteed one-on-one time with our team, booking an appointment is the way to go. Can I help you set one up?;
+    return `We're open **${KB.hours}**. Walk-ins are always welcome, but if you want guaranteed one-on-one time with our team, booking an appointment is the way to go. Can I help you set one up?`;
 
   // Location / address / directions
   if (/where|location|address|find you|directions|map/.test(t))
-    return You can find us at **${KB.address}**. We're easy to spot — look for the giant Alex Auto sign! Need turn-by-turn directions or want me to pull up the address on maps?;
+    return `You can find us at **${KB.address}**. We're easy to spot — look for the giant Alex Auto sign! Need turn-by-turn directions or want me to pull up the address on maps?`;
 
   // Contact / phone
   if (/phone|call|contact|number|reach/.test(t))
-    return You can reach us at **${KB.phone}** or drop by ${KB.address}. Our team is available ${KB.hours}. Want me to help you book an appointment right now?;
+    return `You can reach us at **${KB.phone}** or drop by ${KB.address}. Our team is available ${KB.hours}. Want me to help you book an appointment right now?`;
 
   // Safety / warranty / reliability
   if (/safe|warranty|reliable|recall|trust|dependable/.test(t))
-    return Great thing to consider! Most of our vehicles come with manufacturer warranties ranging from 3 to 10 years. We also offer extended warranty plans and certified pre-owned options.join(', ')}\n• **SUVs**: ${KB.inventory.suvs.slice(0,3).join(', ')}\n• **Trucks**: ${KB.inventory.trucks.slice(0,3).join(', ')}\n• **Electric**: ${KB.inventory.electric.slice(0,3).join(', ')}\n\nSee anything that sparks your interest?;
-
-  // Trucks
-  if (/truck|pickup|f.?150|silverado|ram 1500|tacoma|f150/.test(t))
-    return Oh, we love trucks here! Our current lineup includes: ${KB.inventory.trucks.join(', ')}. The F-150 is our best-seller — incredibly versatile. The Ram 1500 has that luxury cabin feel if you want premium comfort. Want to book a test drive for any of these?;
-
-  // Electric / EV
-  if (/electric|ev|bolt|ioniq|mach.?e|tesla|zero emission|plug.?in|charge/.test(t))
-    return Going electric? Smart move! Here's our EV lineup: ${KB.inventory.electric.join(', ')}. The Chevy Bolt is our best value EV, and the Mustang Mach-E is a crowd favourite for its range and style. Need details on charging, range, or tax credits?;
-
-  // Mustang
-  if (/mustang/.test(t))
-    return Ah, a person of culture! 🐎 The Mustang lineup is legendary. Here's what we have: ${KB.inventory.mustang.join(', ')}. The GT is pure V8 joy, the Dark Horse is track-ready beast mode, and the Mach-E is the electric future. Which one's calling your name?;
-
-  // SUVs
-  if (/suv|crossover|explorer|equinox|rav4|sportage/.test(t))
-    return SUVs are super popular right now — and for good reason! Our selection: ${KB.inventory.suvs.join(', ')}. The RAV4 is our top-seller for reliability, and the Explorer is awesome if you need more space. Want me to narrow it down by budget or family size?;
-
-  // Sedans
-  if (/sedan|civic|camry|sonata|four.?door/.test(t))
-    return Classic and practical! Our sedan lineup: ${KB.inventory.sedans.join(', ')}. The Civic is fantastic value, and the Camry is practically bulletproof in terms of reliability. Any of those catch your eye?;
-
-  // Luxury
-  if (/luxury|premium|bmw|mercedes|audi|high.?end/.test(t))
-    return Ready to treat yourself? Our luxury selection: ${KB.inventory.luxury.join(', ')}. Each one comes with a premium experience from purchase to service. Want to schedule a private viewing?;
-
-  // Test drive
-  if (/test.?drive|test drive|drive it|try.*(car|it)/.test(t))
-    return Absolutely — nothing beats getting behind the wheel! You can book a test drive ${KB.testDrive}. We're available ${KB.hours}. Which vehicle were you thinking of taking for a spin?;
-
-  // Price / cost
-  if (/price|cost|how much|expensive|cheap|afford|budget|payment/.test(t))
-    return Prices vary across our inventory — from the Chevy Bolt EV at around $26,500 all the way up to luxury trims above $50K. We also have **${KB.financing}**. Want me to find options that match a specific budget?;
-
-  // Financing / trade-in
-  if (/financ|loan|apr|monthly|trade.?in|credit|down payment|pre.?approv/.test(t))
-    return We make financing easy! We offer **${KB.financing}**. Our finance team can usually get you an answer within minutes. Want to come in for a consultation, or would you prefer to start online?;
-
-  // Hours
-  if (/hour|open|close|when|schedule|time/.test(t))
-    return We're open **${KB.hours}**. Walk-ins are always welcome, but if you want guaranteed one-on-one time with our team, booking an appointment is the way to go. Can I help you set one up?;
-
-  // Location / address / directions
-  if (/where|location|address|find you|directions|map/.test(t))
-    return You can find us at **${KB.address}**. We're easy to spot — look for the giant Alex Auto sign! Need turn-by-turn directions or want me to pull up the address on maps?;
-
-  // Contact / phone
-  if (/phone|call|contact|number|reach/.test(t))
-    return You can reach us at **${KB.phone}** or drop by ${KB.address}. Our team is available ${KB.hours}. Want me to help you book an appointment right now?;
-
-  // Safety / warranty / reliability
-  if (/safe|warranty|reliable|recall|trust|dependable/.test(t))
-    return Great thing to consider! Most of our vehicles come with manufacturer warranties ranging from 3 to 10 years. We also offer extended warranty plans and certified pre-owned options.
-    Safety ratings are posted for every model in our showroom. Which car are you researching?;
+    return `Great thing to consider! Most of our vehicles come with manufacturer warranties ranging from 3 to 10 years. We also offer extended warranty plans and certified pre-owned options. Safety ratings are posted for every model in our showroom. Which car are you researching?`;
 
   // Bye / thanks
   if (/bye|goodbye|thank|thanks|cheers|later|see ya/.test(t))
-    return It was a pleasure chatting with you! 🚗 Come on in anytime — Alex Automotive at ${KB.address}. We'll find you the perfect ride. See you soon!;
+    return `It was a pleasure chatting with you! 🚗 Come on in anytime — Alex Automotive at ${KB.address}. We'll find you the perfect ride. See you soon!`;
 
   // Joke / fun
   if (/joke|funny|laugh|humor/.test(t))
-    return Ha! Okay, here's one: Why did the car break up with the mechanic? Because he kept taking her for granted! 😄 Now — ready to find a car that'll never let you down?;
+    return `Ha! Okay, here's one: Why did the car break up with the mechanic? Because he kept taking her for granted! 😄 Now — ready to find a car that'll never let you down?`;
 
   // Comparison
   if (/compare|vs|versus|difference|better|which one/.test(t))
-    return Happy to help you compare! Tell me the two (or more) models you're weighing and I'll break down the key differences — price, features, fuel economy, whatever matters most to you.;
+    return `Happy to help you compare! Tell me the two (or more) models you're weighing and I'll break down the key differences — price, features, fuel economy, whatever matters most to you.`;
 
   // Color / exterior
   if (/color|colour|red|black|white|blue|silver|paint/.test(t))
-    return Most of our models come in a great range of colors — from classic whites and blacks to bold reds and blues. Exact availability depends on the trim. Let me know which model you have in mind and I can check what we have in stock!;
+    return `Most of our models come in a great range of colors — from classic whites and blacks to bold reds and blues. Exact availability depends on the trim. Let me know which model you have in mind and I can check what we have in stock!`;
 
   // Default
   const defaults = [
-    That's a great question! I specialize in helping you find the perfect car, book test drives, and explore financing. Could you tell me more about what you're looking for?,
-    Hmm, let me make sure I understand — are you asking about a specific car, pricing, or something else? I'm here to help!,
-    I want to give you the best answer possible! Could you rephrase that, or ask me about our inventory, test drives, pricing, or financing?,
-    Good one! I'm still learning every day. Try asking me about specific models, trucks, EVs, the Mustang, or how to book a test drive — I love those topics!,
+    `That's a great question! I specialize in helping you find the perfect car, book test drives, and explore financing. Could you tell me more about what you're looking for?`,
+    `Hmm, let me make sure I understand — are you asking about a specific car, pricing, or something else? I'm here to help!`,
+    `I want to give you the best answer possible! Could you rephrase that, or ask me about our inventory, test drives, pricing, or financing?`,
+    `Good one! I'm still learning every day. Try asking me about specific models, trucks, EVs, the Mustang, or how to book a test drive — I love those topics!`,
   ];
   return defaults[Math.floor(Math.random() * defaults.length)];
 }
@@ -460,7 +404,7 @@ function setStatus(state, text) {
 
 function addMessage(role, text) {
   const div = document.createElement('div');
-  div.className = msg ${role};
+  div.className = `msg ${role}`;
 
   const avatar = document.createElement('div');
   avatar.className = 'avatar';
@@ -521,8 +465,7 @@ function speak(text) {
 
   utter.onstart = () => { isSpeaking = true;  setStatus('speaking', 'Alex is speaking…'); };
   utter.onend   = () => { isSpeaking = false; setStatus('', 'Ready when you are'); };
-  utter.
-    onerror = () => { isSpeaking = false; setStatus('', 'Ready when you are'); };
+  utter.onerror = () => { isSpeaking = false; setStatus('', 'Ready when you are'); };
 
   window.speechSynthesis.speak(utter);
 }
@@ -621,7 +564,7 @@ if ('speechSynthesis' in window) {
 initRecognition();
 
 setTimeout(() => {
-  addMessage('alex', `Hey, welcome to Alex Automotive! 🚗 I'm Alex — your AI-powered car specialist. Whether you're after a truck, an EV, the iconic Mustang, or just want to explore your options, I'm here to help. What are you looking for today?`);
+  addMessage('alex', `Hey, welcome to **Alex Automotive**! 🚗 I'm Alex — your AI-powered car specialist. Whether you're after a truck, an EV, the iconic Mustang, or just want to explore your options, I'm here to help. What are you looking for today?`);
   speak(`Hey, welcome to Alex Automotive! I'm Alex, your car specialist. What kind of vehicle are you looking for today?`);
 }, 500);
 </script>
