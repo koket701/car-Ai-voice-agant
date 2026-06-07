@@ -135,26 +135,17 @@
     .tdots span:nth-child(3){animation-delay:.32s}
     @keyframes td{0%,80%,100%{transform:scale(1)}40%{transform:scale(1.6)}}
 
-    /* CONFIG PANEL */
-    #cfg{position:absolute;top:14px;right:22px;z-index:10}
-    #cfgbtn{background:var(--s2);border:1px solid var(--border2);color:var(--sub);
-      font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.06em;
-      padding:4px 10px;border-radius:5px;cursor:pointer;transition:color .2s,border-color .2s}
-    #cfgbtn:hover{color:var(--text);border-color:var(--border)}
-    #cfgpanel{display:none;position:absolute;top:30px;right:0;width:280px;
-      background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:14px;
-      font-size:.78rem;color:var(--sub)}
-    #cfgpanel.open{display:block}
-    #cfgpanel label{display:block;margin-bottom:4px;font-family:'JetBrains Mono',monospace;font-size:.62rem;
-      letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-    #cfgpanel input{width:100%;background:var(--s3);border:1px solid var(--border2);color:var(--text);
-      border-radius:5px;padding:6px 9px;font-size:.78rem;margin-bottom:10px;outline:none}
-    #cfgpanel input:focus{border-color:var(--green)}
-    #cfgpanel .cfgsave{width:100%;background:var(--green);border:none;color:#000;
-      font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;
-      padding:7px;border-radius:6px;cursor:pointer}
-    #cfgpanel .cfgsave:hover{background:var(--gdim)}
-    #cfgpanel p{font-size:.68rem;color:var(--muted);line-height:1.5;margin-top:6px}
+    /* PRICE CARD */
+    .pcard{margin-top:10px;background:var(--s3);border:1px solid var(--border2);border-radius:10px;overflow:hidden}
+    .pcard-title{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px 12px 6px}
+    .prow{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-top:1px solid var(--border)}
+    .prow:first-of-type{border-top:none}
+    .prow .pname{font-size:.83rem;font-weight:400;color:var(--text)}
+    .prow .ptag{font-size:.7rem;color:var(--sub);margin-left:6px}
+    .prow .pprice{font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:500;color:var(--green)}
+    .prow.highlight{background:#00ff870a}
+    .prow.highlight .pname{color:var(--green)}
+    .ptax{font-size:.68rem;color:var(--muted);padding:6px 12px 8px;border-top:1px solid var(--border)}
   </style>
 </head>
 <body>
@@ -181,21 +172,6 @@
       <span id="bplabel">BOOKING</span>
     </div>
   </header>
-
-  <!-- Config panel (top-right gear) -->
-  <div id="cfg">
-    <button id="cfgbtn" onclick="toggleCfg()">⚙ CONFIG</button>
-    <div id="cfgpanel">
-      <label>ElevenLabs Voice ID</label>
-      <input id="voiceId" placeholder="e.g. 21m00Tcm4TlvDq8ikWAM" />
-      <label>ElevenLabs API Key</label>
-      <input id="apiKey" type="password" placeholder="sk_..." />
-      <label>Audio CDN Base URL</label>
-      <input id="cdnBase" placeholder="https://your-cdn.com/audio/" />
-      <button class="cfgsave" onclick="saveConfig()">SAVE CONFIG</button>
-      <p>Config is stored in sessionStorage. For production, set these server-side.</p>
-    </div>
-  </div>
 
   <div id="chat"></div>
   <div id="live"></div>
@@ -237,26 +213,6 @@ let CFG = {
   // Booking webhook — POST booking data here when complete
   bookingEndpoint: '/api/bookings',
 };
-
-function toggleCfg(){
-  document.getElementById('cfgpanel').classList.toggle('open');
-  if(document.getElementById('cfgpanel').classList.contains('open')){
-    document.getElementById('voiceId').value = CFG.voiceId;
-    document.getElementById('apiKey').value  = CFG.apiKey;
-    document.getElementById('cdnBase').value = CFG.cdnBase;
-  }
-}
-function saveConfig(){
-  CFG.voiceId = document.getElementById('voiceId').value.trim();
-  CFG.apiKey  = document.getElementById('apiKey').value.trim();
-  CFG.cdnBase = document.getElementById('cdnBase').value.trim();
-  sessionStorage.setItem('elv_voice_id', CFG.voiceId);
-  sessionStorage.setItem('elv_api_key',  CFG.apiKey);
-  sessionStorage.setItem('elv_cdn_base', CFG.cdnBase);
-  document.getElementById('cfgpanel').classList.remove('open');
-  document.getElementById('elvbadge').style.display = CFG.voiceId ? '' : 'none';
-  addMsg('alex','✅ Config saved! ElevenLabs voice will be used when available.');
-}
 
 // ── DOM REFS ─────────────────────────────────────────────────
 const chatEl  = document.getElementById('chat');
@@ -308,36 +264,115 @@ const R = {
     `Hey, good to have you here! I'm Alex, your personal guide at Alex Automotive. Think of me as that car-obsessed friend who also knows all the deals. So what kind of car are we talking about today?`,
   ],
   inventory:[
-    `Oh great question. So right now we've got a really solid spread. For sedans we have the Honda Civic, Toyota Camry and Hyundai Sonata, all in the twenty to twenty-eight thousand range. SUVs include the RAV4, Explorer, Equinox and Sportage. Trucks we've got the F-150, Silverado, Ram 1500 and Tacoma. And we have a growing EV section too. Honestly, what kind of driving do you mostly do? That'll help me narrow it down for you.`,
-    `Sure! We're stocked up pretty well across sedans, SUVs, trucks and EVs, a good mix across all price ranges. Some really exciting stuff just came in too. What matters most to you, is it reliability, fuel economy, looks or size? Let's figure out what fits your life.`,
+    `Oh great question! Right now we've got a really solid spread across sedans, SUVs, trucks and EVs. I've pulled up our current lineup for you. What kind of driving do you mostly do? That'll help me point you to the right section.`+
+    `<div class="pcard"><div class="pcard-title">Current Inventory Overview</div>`+
+    `<div class="prow"><span class="pname">Sedans</span><span class="pprice">from $23,500</span></div>`+
+    `<div class="prow"><span class="pname">SUVs</span><span class="pprice">from $29,800</span></div>`+
+    `<div class="prow highlight"><span class="pname">Trucks <span class="ptag">Best sellers</span></span><span class="pprice">from $35,000</span></div>`+
+    `<div class="prow"><span class="pname">Electric Vehicles</span><span class="pprice">from $26,500</span></div>`+
+    `</div>`,
+    `Sure! We're stocked up well across all categories. Some really exciting stuff just came in too. What matters most to you, is it reliability, fuel economy, looks or size? Let's figure out what fits your life.`,
   ],
   trucks:[
-    `Oh yeah, trucks! Now we're talking. So we've got the Ford F-150 starting at thirty-nine thousand, the Chevy Silverado at forty-one five, Ram 1500 at forty-three two, and the Toyota Tacoma at thirty-five. The F-150 is honestly our best seller, so versatile. But the Ram has this incredible interior that almost feels luxury. Are you using it more for work, hauling stuff, or more of a weekend adventure truck?`,
-    `Trucks, love it! Okay so we have the F-150, Silverado, Ram 1500 and Tacoma all on the lot right now. The F-150 is the crowd favourite. The Ram is the comfy one. The Tacoma is basically bulletproof reliable. What would you be doing with it mostly?`,
+    `Oh yeah, trucks! Now we're talking. We've got four great options on the lot right now. The F-150 is honestly our best seller, super versatile. The Ram has an incredible interior that almost feels luxury. Are you using it more for work, hauling stuff, or weekend adventures?`+
+    `<div class="pcard"><div class="pcard-title">Trucks — Starting Prices</div>`+
+    `<div class="prow highlight"><span class="pname">Ford F-150 <span class="ptag">Best seller</span></span><span class="pprice">$39,000</span></div>`+
+    `<div class="prow"><span class="pname">Chevy Silverado</span><span class="pprice">$41,500</span></div>`+
+    `<div class="prow"><span class="pname">Ram 1500 <span class="ptag">Luxury interior</span></span><span class="pprice">$43,200</span></div>`+
+    `<div class="prow"><span class="pname">Toyota Tacoma <span class="ptag">Most reliable</span></span><span class="pprice">$35,000</span></div>`+
+    `</div>`,
+    `Trucks, love it! We have the F-150, Silverado, Ram 1500 and Tacoma all on the lot. The F-150 is the crowd favourite. The Tacoma is basically bulletproof reliable. What would you be doing with it mostly?`+
+    `<div class="pcard"><div class="pcard-title">Trucks — Starting Prices</div>`+
+    `<div class="prow highlight"><span class="pname">Ford F-150</span><span class="pprice">$39,000</span></div>`+
+    `<div class="prow"><span class="pname">Chevy Silverado</span><span class="pprice">$41,500</span></div>`+
+    `<div class="prow"><span class="pname">Ram 1500</span><span class="pprice">$43,200</span></div>`+
+    `<div class="prow"><span class="pname">Toyota Tacoma</span><span class="pprice">$35,000</span></div>`+
+    `</div>`,
   ],
   electric:[
-    `Smart move. EVs are honestly where it's at right now. We've got the Chevy Bolt EV at twenty-six five, which is incredible value. Tesla Model 3 at around forty-two grand. Ford Mustang Mach-E at forty-three. And the Hyundai Ioniq 6 at thirty-eight six, which is a stunning car. Plus there are federal tax credits that could knock several thousand off the price. Is this your first EV or are you upgrading from one?`,
-    `Ooh, going electric, love that! Our EV lineup is the Bolt, Model 3, Mach-E and Ioniq 6. The Bolt is crazy good value. The Mach-E looks amazing. And you might qualify for the federal seventy-five hundred dollar tax credit. Want to set up a test drive so you can really feel the difference? It's kind of a game changer.`,
+    `Smart move. EVs are honestly where it's at right now. We've got four great options and you might also qualify for a federal $7,500 tax credit depending on your income. Is this your first EV or are you upgrading from one?`+
+    `<div class="pcard"><div class="pcard-title">Electric Vehicles — Starting Prices</div>`+
+    `<div class="prow highlight"><span class="pname">Chevy Bolt EV <span class="ptag">Best value</span></span><span class="pprice">$26,500</span></div>`+
+    `<div class="prow"><span class="pname">Hyundai Ioniq 6 <span class="ptag">Stunning design</span></span><span class="pprice">$38,600</span></div>`+
+    `<div class="prow"><span class="pname">Ford Mustang Mach-E</span><span class="pprice">$43,000</span></div>`+
+    `<div class="prow"><span class="pname">Tesla Model 3</span><span class="pprice">$42,000</span></div>`+
+    `<div class="ptax">Federal tax credit up to $7,500 may apply. Ask our team for eligibility.</div>`+
+    `</div>`,
+    `Ooh, going electric, love that! The Bolt is crazy good value. The Mach-E looks amazing. Want to set up a test drive so you can really feel the difference? It's a game changer.`+
+    `<div class="pcard"><div class="pcard-title">EV Lineup — Starting Prices</div>`+
+    `<div class="prow highlight"><span class="pname">Chevy Bolt EV <span class="ptag">Best value</span></span><span class="pprice">$26,500</span></div>`+
+    `<div class="prow"><span class="pname">Hyundai Ioniq 6</span><span class="pprice">$38,600</span></div>`+
+    `<div class="prow"><span class="pname">Ford Mustang Mach-E</span><span class="pprice">$43,000</span></div>`+
+    `<div class="prow"><span class="pname">Tesla Model 3</span><span class="pprice">$42,000</span></div>`+
+    `<div class="ptax">Federal tax credit up to $7,500 may apply.</div>`+
+    `</div>`,
   ],
   mustang:[
-    `The Mustang, okay this is genuinely my favourite topic. We've got the full lineup. EcoBoost at thirty-two five, actually really fun to drive and great on fuel. GT with the V8 at forty-two five, that sound is just iconic. The Dark Horse at fifty-seven nine is track ready right off the lot. And the Mach-E at forty-three grand if you want that Mustang energy but fully electric. Have you ever driven a V8 Mustang? Because if not, the GT might just change your life.`,
+    `The Mustang, okay this is genuinely my favourite topic. We've got the full lineup from the peppy EcoBoost all the way to the track-ready Dark Horse. Have you ever driven a V8 Mustang? Because if not, the GT might just change your life.`+
+    `<div class="pcard"><div class="pcard-title">Mustang Lineup — Starting Prices</div>`+
+    `<div class="prow"><span class="pname">EcoBoost <span class="ptag">Great on fuel</span></span><span class="pprice">$32,500</span></div>`+
+    `<div class="prow highlight"><span class="pname">GT V8 <span class="ptag">Iconic sound</span></span><span class="pprice">$42,500</span></div>`+
+    `<div class="prow"><span class="pname">Dark Horse <span class="ptag">Track ready</span></span><span class="pprice">$57,900</span></div>`+
+    `<div class="prow"><span class="pname">Mach-E <span class="ptag">Fully electric</span></span><span class="pprice">$43,000</span></div>`+
+    `</div>`,
   ],
   suv:[
-    `SUVs are our most popular category right now and honestly for good reason. RAV4 at thirty-one two is super reliable with great resale value. Ford Explorer at forty-two is perfect for families. Chevy Equinox at thirty-three five is great value for what you get. Kia Sportage at twenty-nine eight is underrated but fantastic. What's your main priority, is it space, fuel economy or staying within a certain budget?`,
-    `Great choice! SUVs are flying off the lot. The RAV4 and Explorer are our most popular ones. The Sportage punches way above its price point. Want me to set up a time to come try one out?`,
+    `SUVs are our most popular category right now and honestly for good reason. We've got four great options. What's your main priority, is it space, fuel economy or staying within a certain budget?`+
+    `<div class="pcard"><div class="pcard-title">SUVs — Starting Prices</div>`+
+    `<div class="prow"><span class="pname">Kia Sportage <span class="ptag">Best value</span></span><span class="pprice">$29,800</span></div>`+
+    `<div class="prow highlight"><span class="pname">Toyota RAV4 <span class="ptag">Most popular</span></span><span class="pprice">$31,200</span></div>`+
+    `<div class="prow"><span class="pname">Chevy Equinox</span><span class="pprice">$33,500</span></div>`+
+    `<div class="prow"><span class="pname">Ford Explorer <span class="ptag">Best for families</span></span><span class="pprice">$42,000</span></div>`+
+    `</div>`,
+    `Great choice! SUVs are flying off the lot right now. The RAV4 and Explorer are our most popular. The Sportage punches way above its price point. Want me to set up a time to come try one out?`+
+    `<div class="pcard"><div class="pcard-title">SUVs — Starting Prices</div>`+
+    `<div class="prow"><span class="pname">Kia Sportage</span><span class="pprice">$29,800</span></div>`+
+    `<div class="prow highlight"><span class="pname">Toyota RAV4 <span class="ptag">Most popular</span></span><span class="pprice">$31,200</span></div>`+
+    `<div class="prow"><span class="pname">Chevy Equinox</span><span class="pprice">$33,500</span></div>`+
+    `<div class="prow"><span class="pname">Ford Explorer</span><span class="pprice">$42,000</span></div>`+
+    `</div>`,
   ],
   sedan:[
-    `For sedans we've got some great choices right now. Honda Civic at twenty-three five with amazing reliability and efficiency. Toyota Camry at twenty-seven nine, honestly one of the best long-term investments you can make. Hyundai Sonata at twenty-six four, packed with features. Is this mainly for daily commuting or more of an all-around car?`,
+    `For sedans we've got three great choices right now. The Civic is amazing for reliability and efficiency. The Camry is honestly one of the best long-term investments you can make. Is this mainly for daily commuting or more of an all-around car?`+
+    `<div class="pcard"><div class="pcard-title">Sedans — Starting Prices</div>`+
+    `<div class="prow highlight"><span class="pname">Honda Civic <span class="ptag">Most efficient</span></span><span class="pprice">$23,500</span></div>`+
+    `<div class="prow"><span class="pname">Hyundai Sonata <span class="ptag">Feature-packed</span></span><span class="pprice">$26,400</span></div>`+
+    `<div class="prow"><span class="pname">Toyota Camry <span class="ptag">Best resale value</span></span><span class="pprice">$27,900</span></div>`+
+    `</div>`,
   ],
   finance:[
-    `Financing, great thing to ask about. Right now we've got zero percent APR for thirty-six months on select models, which is huge. We also have sixty and seventy-two month options for lower monthly payments. We do trade-ins too, and depending on your car you might get up to five thousand dollars off. Pre-approval literally takes about five minutes online. It's way less stressful than people expect. Want me to help get a booking set up so you can sit down with our finance team?`,
+    `Financing, great thing to ask about. Right now we've got zero percent APR for 36 months on select models, which is huge. We also have 60 and 72 month options for lower monthly payments. We do trade-ins too and pre-approval takes about 5 minutes online. Want me to get a booking set up so you can sit down with our finance team?`+
+    `<div class="pcard"><div class="pcard-title">Financing Options</div>`+
+    `<div class="prow highlight"><span class="pname">0% APR <span class="ptag">Select models</span></span><span class="pprice">36 months</span></div>`+
+    `<div class="prow"><span class="pname">Low monthly payments</span><span class="pprice">60 or 72 months</span></div>`+
+    `<div class="prow"><span class="pname">Trade-in credit</span><span class="pprice">up to $5,000</span></div>`+
+    `<div class="ptax">Pre-approval available online in approx. 5 minutes. Subject to credit approval.</div>`+
+    `</div>`,
   ],
   hours:[
-    `We're open Monday through Saturday, nine AM to eight PM, and Sundays eleven to five. We're at 1200 Auto Drive in Motorville, big Alex Auto sign out front, you really can't miss it. You can also call us at 555-280-4100. Want to lock in a time so someone is ready for you when you arrive?`,
+    `We're open Monday through Saturday, 9 AM to 8 PM, and Sundays 11 AM to 5 PM. We're at 1200 Auto Drive in Motorville, big Alex Auto sign out front, you really can't miss it. Want to lock in a time so someone is ready for you when you arrive?`+
+    `<div class="pcard"><div class="pcard-title">Dealership Hours & Location</div>`+
+    `<div class="prow highlight"><span class="pname">Mon – Sat</span><span class="pprice">9:00 AM – 8:00 PM</span></div>`+
+    `<div class="prow"><span class="pname">Sunday</span><span class="pprice">11:00 AM – 5:00 PM</span></div>`+
+    `<div class="prow"><span class="pname">Address</span><span class="pprice" style="font-size:.75rem">1200 Auto Drive, Motorville</span></div>`+
+    `<div class="prow"><span class="pname">Phone</span><span class="pprice" style="font-size:.75rem">555-280-4100</span></div>`+
+    `</div>`,
   ],
   service:[
-    `Absolutely, we'd love to take care of your car! Our service team handles everything from oil changes and diagnostics to full inspections, repairs and detailing. Let me get you set up with a booking. What's the issue or what service do you need done?`,
-    `For sure! Our service department is top-notch. We do oil changes, brake work, full diagnostics, detailing, all of it. Let me start booking you in. First up, what vehicle are we servicing?`,
+    `Absolutely, we'd love to take care of your car! Our service team handles everything from oil changes and diagnostics to full inspections, repairs and detailing. Let me get you set up with a booking. What's the issue or what service do you need done?`+
+    `<div class="pcard"><div class="pcard-title">Service Department</div>`+
+    `<div class="prow"><span class="pname">Oil Change</span><span class="pprice">from $49</span></div>`+
+    `<div class="prow"><span class="pname">Full Inspection</span><span class="pprice">from $89</span></div>`+
+    `<div class="prow"><span class="pname">Brake Service</span><span class="pprice">from $149</span></div>`+
+    `<div class="prow"><span class="pname">Diagnostics</span><span class="pprice">from $99</span></div>`+
+    `<div class="prow highlight"><span class="pname">Detail Package <span class="ptag">Interior + Exterior</span></span><span class="pprice">from $199</span></div>`+
+    `</div>`,
+    `For sure! Our service department is top-notch. We do oil changes, brake work, full diagnostics, detailing, all of it. Let me start booking you in. What vehicle are we servicing?`+
+    `<div class="pcard"><div class="pcard-title">Service Department</div>`+
+    `<div class="prow"><span class="pname">Oil Change</span><span class="pprice">from $49</span></div>`+
+    `<div class="prow"><span class="pname">Full Inspection</span><span class="pprice">from $89</span></div>`+
+    `<div class="prow highlight"><span class="pname">Detail Package</span><span class="pprice">from $199</span></div>`+
+    `</div>`,
   ],
   consult:[
     `Absolutely, a consultation is a great call, especially if you're comparing a few different models or working through financing options. Our specialists are really low-pressure and genuinely knowledgeable. Want me to get you booked in for that?`,
@@ -689,7 +724,6 @@ function removeTyping(){ const e=document.getElementById('typ'); if(e)e.remove()
 function initVoices(cb){ const v=window.speechSynthesis.getVoices(); if(v.length>0){cb();return;} window.speechSynthesis.onvoiceschanged=()=>cb(); window.speechSynthesis.getVoices(); }
 
 // ── BOOT ──────────────────────────────────────────────────────
-if(CFG.voiceId) document.getElementById('elvbadge').style.display='';
 initSR();
 initVoices(()=>{
   setTimeout(()=>{
@@ -699,8 +733,6 @@ initVoices(()=>{
   },500);
 });
 
-// Close config panel on outside click
-document.addEventListener('click',e=>{ if(!document.getElementById('cfg').contains(e.target)) document.getElementById('cfgpanel').classList.remove('open'); });
 </script>
 </body>
 </html>
