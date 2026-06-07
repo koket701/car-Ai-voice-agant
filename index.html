@@ -3,21 +3,19 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Alex — Alex Automotive</title>
+  <title>Alex — Alex Automotive AI Voice Agent</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#08090b; --s1:#0e1114; --s2:#13171c; --s3:#1a2028;
-      --border:#1f2830; --border2:#263040;
-      --green:#00ff87; --gdim:#00c866; --gdark:#007a3d; --glow:#00ff8722; --glow2:#00ff8744;
-      --amber:#ffb830; --blue:#38bdf8; --red:#ff4060;
-      --text:#ddeeff; --sub:#7a9bb5; --muted:#3a5268;
-      --user-bub:#0a2218; --user-border:#0f3a28;
+      --bg:#08090b;--s1:#0e1114;--s2:#13171c;--s3:#1a2028;
+      --border:#1f2830;--border2:#263040;
+      --green:#00ff87;--gdim:#00c866;--gdark:#007a3d;--glow:#00ff8722;--glow2:#00ff8744;
+      --amber:#ffb830;--blue:#38bdf8;--red:#ff4060;--purple:#a78bfa;
+      --text:#ddeeff;--sub:#7a9bb5;--muted:#3a5268;
+      --user-bub:#0a2218;--user-border:#0f3a28;
     }
     html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow:hidden}
-
-    /* BG */
     body::before{content:'';position:fixed;inset:0;z-index:0;
       background:radial-gradient(ellipse 70% 45% at 50% -5%,#00ff8712 0%,transparent 65%),
                  radial-gradient(ellipse 40% 30% at 85% 80%,#38bdf808 0%,transparent 60%);
@@ -26,8 +24,7 @@
       background-image:linear-gradient(var(--border) 1px,transparent 1px),
                        linear-gradient(90deg,var(--border) 1px,transparent 1px);
       background-size:52px 52px;opacity:.22;pointer-events:none}
-
-    #app{position:relative;z-index:1;display:flex;flex-direction:column;height:100dvh;max-width:720px;margin:0 auto}
+    #app{position:relative;z-index:1;display:flex;flex-direction:column;height:100dvh;max-width:740px;margin:0 auto}
 
     /* HEADER */
     header{flex-shrink:0;padding:0 22px;border-bottom:1px solid var(--border);backdrop-filter:blur(10px)}
@@ -49,6 +46,7 @@
       padding:3px 9px;border-radius:4px;border:1px solid}
     .badge.live{color:var(--green);border-color:var(--gdark);background:#00ff8710}
     .badge.book{color:var(--amber);border-color:#7a5010;background:#ffb83010}
+    .badge.eleven{color:var(--purple);border-color:#4c2d9a;background:#a78bfa10}
 
     /* BOOKING PROGRESS */
     #progress{display:none;align-items:center;gap:5px;padding:8px 0 10px}
@@ -58,11 +56,14 @@
     @keyframes bshine{0%,100%{opacity:1}50%{opacity:.55}}
     #bplabel{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.07em;flex-shrink:0;margin-left:3px}
 
+    /* AUDIO SOURCE INDICATOR */
+    #audiosrc{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--purple);letter-spacing:.06em;
+      padding:3px 9px;border-radius:4px;border:1px solid #4c2d9a;background:#a78bfa10;display:none;flex-shrink:0}
+
     /* CHAT */
     #chat{flex:1;overflow-y:auto;padding:18px 18px 8px;display:flex;flex-direction:column;gap:13px;scroll-behavior:smooth}
     #chat::-webkit-scrollbar{width:3px}
     #chat::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
-
     .msg{display:flex;gap:9px;align-items:flex-end;animation:mup .26s cubic-bezier(.22,1,.36,1) both}
     @keyframes mup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .msg.user{flex-direction:row-reverse}
@@ -71,11 +72,10 @@
       font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace}
     .msg.alex .ava{background:var(--green);color:#000;box-shadow:0 0 10px var(--glow2)}
     .msg.user .ava{background:var(--s3);color:var(--sub);border:1px solid var(--border2)}
-    .bub{max-width:80%;padding:11px 15px;border-radius:18px;line-height:1.62;font-size:.87rem;font-weight:300}
+    .bub{max-width:82%;padding:11px 15px;border-radius:18px;line-height:1.62;font-size:.87rem;font-weight:300}
     .msg.alex .bub{background:var(--s2);border:1px solid var(--border2);border-bottom-left-radius:4px}
     .msg.user .bub{background:var(--user-bub);border:1px solid var(--user-border);border-bottom-right-radius:4px;color:#b8f0d8}
     .bub strong{color:var(--green);font-weight:500}
-    .bub .hi{color:var(--amber);font-weight:500}
 
     /* booking card */
     .bcard{margin-top:10px;padding:12px 14px;background:var(--s3);border:1px solid var(--green);border-radius:10px;font-size:.81rem}
@@ -86,13 +86,14 @@
     /* LIVE TEXT */
     #live{flex-shrink:0;min-height:24px;padding:3px 22px;font-size:.73rem;color:var(--sub);font-style:italic}
 
-    /* STATUS */
+    /* STATUS BAR */
     #sbar{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:3px 22px 5px;
       font-family:'JetBrains Mono',monospace;font-size:.63rem;letter-spacing:.04em;color:var(--muted);min-height:26px}
     #sdot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
     #sdot.listening{background:var(--green);animation:db .5s ease infinite alternate}
     #sdot.speaking{background:var(--blue);animation:db .8s ease infinite alternate}
     #sdot.booking{background:var(--amber);animation:db 1s ease infinite alternate}
+    #sdot.eleven{background:var(--purple);animation:db .6s ease infinite alternate}
     #sdot.error{background:var(--red)}
     @keyframes db{from{opacity:1}to{opacity:.15}}
     #wave{display:flex;align-items:center;gap:2px;height:14px;opacity:0;transition:opacity .3s;margin-left:2px}
@@ -119,7 +120,7 @@
     #mic:disabled{opacity:.35;cursor:not-allowed}
     #mic.on{background:linear-gradient(135deg,#8a001a,var(--red));box-shadow:0 0 28px #ff406025,0 4px 18px #00000055}
 
-    .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:520px}
+    .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:560px}
     .chip{background:var(--s2);border:1px solid var(--border2);color:var(--sub);
       font-size:.67rem;letter-spacing:.04em;padding:5px 13px;border-radius:6px;cursor:pointer;
       font-family:'JetBrains Mono',monospace;transition:border-color .2s,color .2s,background .2s}
@@ -133,6 +134,27 @@
     .tdots span:nth-child(2){animation-delay:.16s}
     .tdots span:nth-child(3){animation-delay:.32s}
     @keyframes td{0%,80%,100%{transform:scale(1)}40%{transform:scale(1.6)}}
+
+    /* CONFIG PANEL */
+    #cfg{position:absolute;top:14px;right:22px;z-index:10}
+    #cfgbtn{background:var(--s2);border:1px solid var(--border2);color:var(--sub);
+      font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.06em;
+      padding:4px 10px;border-radius:5px;cursor:pointer;transition:color .2s,border-color .2s}
+    #cfgbtn:hover{color:var(--text);border-color:var(--border)}
+    #cfgpanel{display:none;position:absolute;top:30px;right:0;width:280px;
+      background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:14px;
+      font-size:.78rem;color:var(--sub)}
+    #cfgpanel.open{display:block}
+    #cfgpanel label{display:block;margin-bottom:4px;font-family:'JetBrains Mono',monospace;font-size:.62rem;
+      letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    #cfgpanel input{width:100%;background:var(--s3);border:1px solid var(--border2);color:var(--text);
+      border-radius:5px;padding:6px 9px;font-size:.78rem;margin-bottom:10px;outline:none}
+    #cfgpanel input:focus{border-color:var(--green)}
+    #cfgpanel .cfgsave{width:100%;background:var(--green);border:none;color:#000;
+      font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;
+      padding:7px;border-radius:6px;cursor:pointer}
+    #cfgpanel .cfgsave:hover{background:var(--gdim)}
+    #cfgpanel p{font-size:.68rem;color:var(--muted);line-height:1.5;margin-top:6px}
   </style>
 </head>
 <body>
@@ -142,11 +164,12 @@
       <div class="logo">🚗<div class="pip"></div></div>
       <div class="htxt">
         <h1>ALEX <span>AUTO</span></h1>
-        <p>AI Specialist · Test Drives · EVs · Financing</p>
+        <p>AI Voice Specialist · Test Drives · EVs · Financing</p>
       </div>
       <div class="hbadges">
         <div class="badge live">● LIVE</div>
         <div class="badge book">BOOK NOW</div>
+        <div class="badge eleven" id="elvbadge" style="display:none">♪ ELEVENLABS</div>
       </div>
     </div>
     <div id="progress">
@@ -158,6 +181,21 @@
       <span id="bplabel">BOOKING</span>
     </div>
   </header>
+
+  <!-- Config panel (top-right gear) -->
+  <div id="cfg">
+    <button id="cfgbtn" onclick="toggleCfg()">⚙ CONFIG</button>
+    <div id="cfgpanel">
+      <label>ElevenLabs Voice ID</label>
+      <input id="voiceId" placeholder="e.g. 21m00Tcm4TlvDq8ikWAM" />
+      <label>ElevenLabs API Key</label>
+      <input id="apiKey" type="password" placeholder="sk_..." />
+      <label>Audio CDN Base URL</label>
+      <input id="cdnBase" placeholder="https://your-cdn.com/audio/" />
+      <button class="cfgsave" onclick="saveConfig()">SAVE CONFIG</button>
+      <p>Config is stored in sessionStorage. For production, set these server-side.</p>
+    </div>
+  </div>
 
   <div id="chat"></div>
   <div id="live"></div>
@@ -171,431 +209,498 @@
     <button id="mic">🎤 &nbsp; START TALKING TO ALEX</button>
     <div class="chips">
       <div class="chip" onclick="chip('What cars do you have in stock?')">🚘 Inventory</div>
-      <div class="chip amber" onclick="chip('I want to book a test drive')">📅 Book Test Drive</div>
+      <div class="chip amber" onclick="chip('I want to book a test drive')">📅 Test Drive</div>
       <div class="chip" onclick="chip('Tell me about your electric cars')">⚡ EVs</div>
       <div class="chip" onclick="chip('What trucks do you have?')">🛻 Trucks</div>
       <div class="chip" onclick="chip('Tell me about the Mustang')">🐎 Mustang</div>
       <div class="chip amber" onclick="chip('I need to book a service appointment')">🔧 Service</div>
       <div class="chip" onclick="chip('What financing options do you have?')">💳 Finance</div>
       <div class="chip" onclick="chip('Where are you located?')">📍 Find Us</div>
+      <div class="chip" onclick="chip('Tell me about your SUVs')">🚙 SUVs</div>
+      <div class="chip amber" onclick="chip('I want a consultation with your team')">🤝 Consult</div>
     </div>
   </div>
 </div>
 
 <script>
-// ─────────────────────────────────────────────────────────────
-//  ALEX ULTIMATE — Natural, continuous, warm, human-feeling
-//  ONE TAP → full back-and-forth conversation
-// ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+//  ALEX AUTO — Production AI Voice Agent
+//  Architecture: ElevenLabs MP3 (primary) → Web Speech (fallback)
+//  Scalable intent engine: add new intents in RESPONSE_RULES
+// ═══════════════════════════════════════════════════════════════
 
-const chatEl = document.getElementById('chat');
-const micBtn = document.getElementById('mic');
-const sdot   = document.getElementById('sdot');
-const stxt   = document.getElementById('stxt');
-const waveEl = document.getElementById('wave');
-const liveEl = document.getElementById('live');
-const progEl = document.getElementById('progress');
+// ── CONFIG (set via panel or environment) ────────────────────
+let CFG = {
+  voiceId : sessionStorage.getItem('elv_voice_id') || '',
+  apiKey  : sessionStorage.getItem('elv_api_key')  || '',
+  cdnBase : sessionStorage.getItem('elv_cdn_base') || '',
+  // Booking webhook — POST booking data here when complete
+  bookingEndpoint: '/api/bookings',
+};
 
-let SR = null;
-let conversationOn = false;  // single toggle — on = full conversation loop
-let alexTalking    = false;
-let keepAliveTimer = null;
-let silenceTimer   = null;
-let resumeTimer    = null;   // Chrome speech synthesis keep-alive
+function toggleCfg(){
+  document.getElementById('cfgpanel').classList.toggle('open');
+  if(document.getElementById('cfgpanel').classList.contains('open')){
+    document.getElementById('voiceId').value = CFG.voiceId;
+    document.getElementById('apiKey').value  = CFG.apiKey;
+    document.getElementById('cdnBase').value = CFG.cdnBase;
+  }
+}
+function saveConfig(){
+  CFG.voiceId = document.getElementById('voiceId').value.trim();
+  CFG.apiKey  = document.getElementById('apiKey').value.trim();
+  CFG.cdnBase = document.getElementById('cdnBase').value.trim();
+  sessionStorage.setItem('elv_voice_id', CFG.voiceId);
+  sessionStorage.setItem('elv_api_key',  CFG.apiKey);
+  sessionStorage.setItem('elv_cdn_base', CFG.cdnBase);
+  document.getElementById('cfgpanel').classList.remove('open');
+  document.getElementById('elvbadge').style.display = CFG.voiceId ? '' : 'none';
+  addMsg('alex','✅ Config saved! ElevenLabs voice will be used when available.');
+}
 
-// ── BOOKING STATE ────────────────────────────────────────────
-const STEPS = ['vehicle','date','name','phone','email'];
-let B = { active:false, step:0, type:'test drive', vehicle:'', date:'', name:'', phone:'', email:'' };
+// ── DOM REFS ─────────────────────────────────────────────────
+const chatEl  = document.getElementById('chat');
+const micBtn  = document.getElementById('mic');
+const sdot    = document.getElementById('sdot');
+const stxt    = document.getElementById('stxt');
+const waveEl  = document.getElementById('wave');
+const liveEl  = document.getElementById('live');
+const progEl  = document.getElementById('progress');
+
+// ── STATE ────────────────────────────────────────────────────
+let SR            = null;
+let conversationOn= false;
+let alexTalking   = false;
+let silenceTimer  = null;
+let resumeTimer   = null;
+let currentAudio  = null; // HTMLAudioElement for ElevenLabs MP3
+
+// ── BOOKING STATE MACHINE ────────────────────────────────────
+const BOOKING_STEPS = ['vehicle','date','name','phone','email'];
+let B = {active:false,step:0,type:'test drive',vehicle:'',date:'',name:'',phone:'',email:''};
 
 function resetBooking(){
-  B = {active:false,step:0,type:'test drive',vehicle:'',date:'',name:'',phone:'',email:''};
-  progEl.style.display = 'none';
+  B={active:false,step:0,type:'test drive',vehicle:'',date:'',name:'',phone:'',email:''};
+  progEl.style.display='none';
 }
 function setProgress(i){
-  STEPS.forEach((_,idx)=>{
-    const el = document.getElementById('bp'+idx);
-    if(!el) return;
-    el.className = 'bstep' + (idx < i ? ' done' : idx === i ? ' active' : '');
+  BOOKING_STEPS.forEach((_,idx)=>{
+    const el=document.getElementById('bp'+idx);
+    if(!el)return;
+    el.className='bstep'+(idx<i?' done':idx===i?' active':'');
   });
-  const labels = ['VEHICLE','DATE / TIME','YOUR NAME','PHONE','EMAIL'];
-  document.getElementById('bplabel').textContent = i >= 0 && i < labels.length ? labels[i] : 'BOOKING';
+  const labels=['VEHICLE','DATE / TIME','YOUR NAME','PHONE','EMAIL'];
+  document.getElementById('bplabel').textContent=i>=0&&i<labels.length?labels[i]:'BOOKING';
 }
 
 // ── HELPERS ──────────────────────────────────────────────────
-function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
 
-// ── RESPONSES — rich, warm, natural speech ───────────────────
-// Key technique: shorter sentences, contractions, filler sounds
-// written into the text itself so the TTS reads naturally
-
+// ═══════════════════════════════════════════════════════════════
+//  RESPONSE BANK — all written for natural TTS delivery
+//  Shorter sentences, contractions, spoken numbers, spoken rhythm
+// ═══════════════════════════════════════════════════════════════
 const R = {
   greet:[
-    `Hey! Welcome to Alex Automotive. I'm Alex, and honestly I love this job because I get to help people find their perfect car. So — are you shopping for something specific today, or just exploring your options?`,
-    `Oh hey, welcome in! I'm Alex — your car specialist here at Alex Auto. We've got a really great lineup right now, and I'd love to help you find something you're excited about. What are you thinking?`,
-    `Hi there! Great timing — I was just thinking about how much I love our new EV selection. Anyway, I'm Alex! Whether you're after a test drive, curious about pricing, or want to explore financing — I'm here for it. What's on your mind?`,
-    `Hey, good to have you here! I'm Alex, your personal guide at Alex Automotive. Think of me as that car-obsessed friend who also happens to know everything about deals and inventory. So — what kind of car are we talking about today?`,
+    `Hey, welcome to Alex Automotive! I'm Alex and I genuinely love helping people find the right car. Are you shopping for something specific today or just exploring your options?`,
+    `Oh hey, welcome in! I'm Alex, your car specialist here at Alex Auto. We've got a really solid lineup right now and I'd love to help you find something you're excited about. What are you thinking?`,
+    `Hi there! Great timing. I'm Alex. Whether you're after a test drive, curious about pricing, or want to explore financing, I'm here for all of it. What's on your mind?`,
+    `Hey, good to have you here! I'm Alex, your personal guide at Alex Automotive. Think of me as that car-obsessed friend who also knows all the deals. So what kind of car are we talking about today?`,
   ],
-
   inventory:[
-    `Oh great question. So right now we've got a really solid spread. Sedans — Honda Civic, Toyota Camry, Hyundai Sonata, all in the twenty to twenty-eight thousand range. SUVs — RAV4, Explorer, Equinox, Sportage. Trucks — F-150, Silverado, Ram 1500, Tacoma. And a growing EV section too. Honestly, what kind of driving do you mostly do? That'll help me narrow it down.`,
-    `Sure! We're stocked up pretty well. Sedans, SUVs, trucks, EVs — a good mix across all price ranges. Some really exciting stuff just came in too. What matters most to you — reliability, fuel economy, looks, size? Let's figure out what fits your life.`,
+    `Oh great question. So right now we've got a really solid spread. For sedans we have the Honda Civic, Toyota Camry and Hyundai Sonata, all in the twenty to twenty-eight thousand range. SUVs include the RAV4, Explorer, Equinox and Sportage. Trucks we've got the F-150, Silverado, Ram 1500 and Tacoma. And we have a growing EV section too. Honestly, what kind of driving do you mostly do? That'll help me narrow it down for you.`,
+    `Sure! We're stocked up pretty well across sedans, SUVs, trucks and EVs, a good mix across all price ranges. Some really exciting stuff just came in too. What matters most to you, is it reliability, fuel economy, looks or size? Let's figure out what fits your life.`,
   ],
-
   trucks:[
-    `Oh yeah, trucks — now we're talking! So we've got the Ford F-150 starting at thirty-nine thousand, the Chevy Silverado at forty-one five, Ram 1500 at forty-three two, and the Toyota Tacoma at thirty-five. Honestly the F-150 is our best seller — so versatile. But the Ram has this incredible interior, almost feels luxury. Are you using it more for work, hauling stuff, or more of a weekend adventure truck?`,
-    `Trucks! Love it. Okay so — F-150, Silverado, Ram 1500, Tacoma — all on the lot. The F-150 is the crowd favourite. The Ram is the comfy one. The Tacoma is basically bulletproof reliable. What would you be doing with it mostly?`,
+    `Oh yeah, trucks! Now we're talking. So we've got the Ford F-150 starting at thirty-nine thousand, the Chevy Silverado at forty-one five, Ram 1500 at forty-three two, and the Toyota Tacoma at thirty-five. The F-150 is honestly our best seller, so versatile. But the Ram has this incredible interior that almost feels luxury. Are you using it more for work, hauling stuff, or more of a weekend adventure truck?`,
+    `Trucks, love it! Okay so we have the F-150, Silverado, Ram 1500 and Tacoma all on the lot right now. The F-150 is the crowd favourite. The Ram is the comfy one. The Tacoma is basically bulletproof reliable. What would you be doing with it mostly?`,
   ],
-
   electric:[
-    `Smart move — EVs are honestly where it's at right now. So we've got the Chevy Bolt EV at twenty-six five, which is incredible value. Tesla Model 3 at around forty-two grand. Ford Mustang Mach-E at forty-three. And the Hyundai Ioniq 6 at thirty-eight six — stunning car. Plus there are federal tax credits that could knock several thousand off the price. Is this your first EV, or are you upgrading from one?`,
-    `Ooh, going electric — love that! Our EV lineup is the Bolt, Model 3, Mach-E, and Ioniq 6. The Bolt is crazy good value. The Mach-E looks amazing. And you might qualify for the federal seven-five hundred dollar tax credit depending on your income. Want to set up a test drive so you can really feel the difference? It's kind of a game changer.`,
+    `Smart move. EVs are honestly where it's at right now. We've got the Chevy Bolt EV at twenty-six five, which is incredible value. Tesla Model 3 at around forty-two grand. Ford Mustang Mach-E at forty-three. And the Hyundai Ioniq 6 at thirty-eight six, which is a stunning car. Plus there are federal tax credits that could knock several thousand off the price. Is this your first EV or are you upgrading from one?`,
+    `Ooh, going electric, love that! Our EV lineup is the Bolt, Model 3, Mach-E and Ioniq 6. The Bolt is crazy good value. The Mach-E looks amazing. And you might qualify for the federal seventy-five hundred dollar tax credit. Want to set up a test drive so you can really feel the difference? It's kind of a game changer.`,
   ],
-
   mustang:[
-    `The Mustang — okay this is genuinely my favourite topic. So we've got the full lineup. EcoBoost at thirty-two five — actually really fun to drive and great on fuel. GT with the V8 at forty-two five — that sound is just iconic, honestly. The Dark Horse at fifty-seven nine — track ready right off the lot. And the Mach-E at forty-three grand if you want that Mustang energy but fully electric. Seriously though — have you ever driven a V8 Mustang? Because if not, the GT might just change your life.`,
+    `The Mustang, okay this is genuinely my favourite topic. We've got the full lineup. EcoBoost at thirty-two five, actually really fun to drive and great on fuel. GT with the V8 at forty-two five, that sound is just iconic. The Dark Horse at fifty-seven nine is track ready right off the lot. And the Mach-E at forty-three grand if you want that Mustang energy but fully electric. Have you ever driven a V8 Mustang? Because if not, the GT might just change your life.`,
   ],
-
   suv:[
-    `SUVs are our most popular right now — and honestly for good reason. RAV4 at thirty-one two — super reliable, great resale value. Ford Explorer at forty-two — perfect for families. Chevy Equinox at thirty-three five — great value for what you get. Kia Sportage at twenty-nine eight — underrated but fantastic. What's your main priority — space, fuel economy, or staying within a certain budget?`,
+    `SUVs are our most popular category right now and honestly for good reason. RAV4 at thirty-one two is super reliable with great resale value. Ford Explorer at forty-two is perfect for families. Chevy Equinox at thirty-three five is great value for what you get. Kia Sportage at twenty-nine eight is underrated but fantastic. What's your main priority, is it space, fuel economy or staying within a certain budget?`,
+    `Great choice! SUVs are flying off the lot. The RAV4 and Explorer are our most popular ones. The Sportage punches way above its price point. Want me to set up a time to come try one out?`,
   ],
-
   sedan:[
-    `For sedans we've got some great choices. Honda Civic at twenty-three five — amazing reliability and efficiency. Toyota Camry at twenty-seven nine — one of the best long-term investments honestly. Hyundai Sonata at twenty-six four — packed with features. Is this mainly for daily commuting, or more of an all-around car?`,
+    `For sedans we've got some great choices right now. Honda Civic at twenty-three five with amazing reliability and efficiency. Toyota Camry at twenty-seven nine, honestly one of the best long-term investments you can make. Hyundai Sonata at twenty-six four, packed with features. Is this mainly for daily commuting or more of an all-around car?`,
   ],
-
   finance:[
-    `Financing — great thing to ask about. So right now we've got zero percent APR for thirty-six months on select models, which is huge. Also sixty and seventy-two month options for lower monthly payments. We do trade-ins too — depending on your car you might get up to five thousand dollars off. And pre-approval literally takes like five minutes online. Honestly it's way less stressful than people expect. Want me to help get a booking set up so you can sit down with our finance team?`,
+    `Financing, great thing to ask about. Right now we've got zero percent APR for thirty-six months on select models, which is huge. We also have sixty and seventy-two month options for lower monthly payments. We do trade-ins too, and depending on your car you might get up to five thousand dollars off. Pre-approval literally takes about five minutes online. It's way less stressful than people expect. Want me to help get a booking set up so you can sit down with our finance team?`,
   ],
-
   hours:[
-    `So we're open Monday through Saturday, nine AM to eight PM, and Sundays eleven to five. We're at 1200 Auto Drive in Motorville — big Alex Auto sign out front, you really can't miss it. You can also call us at 555-280-4100. Want to lock in a time so someone's ready for you when you arrive?`,
+    `We're open Monday through Saturday, nine AM to eight PM, and Sundays eleven to five. We're at 1200 Auto Drive in Motorville, big Alex Auto sign out front, you really can't miss it. You can also call us at 555-280-4100. Want to lock in a time so someone is ready for you when you arrive?`,
   ],
-
   service:[
-    `Absolutely, we'd love to take care of your car! Our service team handles everything — oil changes, diagnostics, full inspections, repairs, detailing. Let me get you set up with a booking. What's the issue, or what service do you need done?`,
+    `Absolutely, we'd love to take care of your car! Our service team handles everything from oil changes and diagnostics to full inspections, repairs and detailing. Let me get you set up with a booking. What's the issue or what service do you need done?`,
+    `For sure! Our service department is top-notch. We do oil changes, brake work, full diagnostics, detailing, all of it. Let me start booking you in. First up, what vehicle are we servicing?`,
   ],
-
+  consult:[
+    `Absolutely, a consultation is a great call, especially if you're comparing a few different models or working through financing options. Our specialists are really low-pressure and genuinely knowledgeable. Want me to get you booked in for that?`,
+  ],
   thanks:[
     `Aw, that genuinely makes my day! Happy I could help. Is there anything else you'd like to know before we wrap up?`,
     `That's so kind, thank you! That's exactly what I'm here for. Anything else I can do for you?`,
   ],
-
   bye:[
-    `It was so great chatting with you! Come on in anytime — we're at 1200 Auto Drive. The team will take great care of you. Hope to see you soon!`,
+    `It was so great chatting with you! Come on in anytime, we're at 1200 Auto Drive. The team will take great care of you. Hope to see you soon!`,
     `Take care! And when you're ready for that test drive, you know where to find us. See you at the lot!`,
   ],
-
   fallback:[
-    `Hmm, I want to make sure I give you a good answer — could you tell me a little more about what you're looking for? Like, is it a specific car, pricing, booking a visit — something like that?`,
+    `Hmm, I want to make sure I give you a good answer. Could you tell me a little more about what you're looking for? Like is it a specific car, pricing, or booking a visit, something like that?`,
     `Oh interesting! I want to actually help you, not just guess. Can you give me a bit more detail? I'm here for cars, test drives, financing, all of it.`,
-    `Good one — I might have missed that. Can you say it another way? I'm totally focused on getting you the best experience here at Alex Auto.`,
+    `Good one, I might have missed that. Can you say it another way? I'm totally focused on getting you the best experience here at Alex Auto.`,
   ],
-
-  // Booking flow — short, warm, natural
   bookStart:[
-    `Awesome, let's get that locked in! Super quick — just a couple of details. First up: what vehicle are you interested in? Even if you're not one hundred percent sure, just say something like SUV or electric and we'll figure it out together.`,
-    `Love it — let's do this! Just need a few quick things from you. First question: which car were you thinking of for this? If you're still deciding, no worries — just give me a general idea.`,
+    `Awesome, let's get that locked in! Super quick, just a couple of details. First up, what vehicle are you interested in? Even if you're not one hundred percent sure, just say something like SUV or electric and we'll figure it out together.`,
+    `Love it, let's do this! Just need a few quick things from you. First question, which car were you thinking of? If you're still deciding, no worries, just give me a general idea.`,
   ],
-  bookVehicle: v => `Nice choice! The ${v} is a great pick. Now — what day and time works best for you? You can say something like this Saturday afternoon, or next Wednesday morning — whatever works.`,
-  bookDate:    d => `Got it — ${d}. Perfect. Now I just need your name so I can set the booking up properly. What should I put down?`,
-  bookName:    n => `Hi ${n}! Almost done — what's the best phone number to reach you on? Our team will give you a quick call to confirm everything.`,
-  bookPhone:   p => `Perfect, got that. Last thing — do you have an email address for the confirmation? Just say skip if you'd rather not.`,
-  bookDone:    b => `
-    <strong>Booking request confirmed!</strong> Here's your summary:<br><br>
+  bookVehicle: v=>`Nice choice! The ${v} is a great pick. So what day and time works best for you? You can say something like this Saturday afternoon or next Wednesday morning, whatever works.`,
+  bookDate:    d=>`Got it, ${d}. Now I just need your name so I can set the booking up properly. What should I put down?`,
+  bookName:    n=>`Hi ${n}! Almost done. What's the best phone number to reach you on? Our team will give you a quick call to confirm everything.`,
+  bookPhone:   p=>`Perfect, got that. Last thing, do you have an email address for the confirmation? Just say skip if you'd rather not.`,
+  bookDone: b=>`
+    <strong>Booking confirmed!</strong> Here's your summary:<br><br>
     <div class="bcard">
       <div class="lbl">Type</div><div class="val">${b.type.charAt(0).toUpperCase()+b.type.slice(1)}</div>
       <div class="lbl">Vehicle</div><div class="val">${b.vehicle}</div>
       <div class="lbl">Preferred Date</div><div class="val">${b.date}</div>
       <div class="lbl">Name</div><div class="val">${b.name}</div>
       <div class="lbl">Phone</div><div class="val">${b.phone}</div>
-      ${b.email && b.email.toLowerCase()!=='skip' ? `<div class="lbl">Email</div><div class="val">${b.email}</div>` : ''}
+      ${b.email&&b.email.toLowerCase()!=='skip'?`<div class="lbl">Email</div><div class="val">${b.email}</div>`:''}
     </div><br>
-    One of our team members will be in touch with you shortly to <strong>confirm the exact time</strong> and answer any last questions. We're really looking forward to meeting you! Is there anything else I can help with?
+    One of our team members will be in touch shortly to confirm the exact time. We're really looking forward to meeting you! Is there anything else I can help with?
   `,
 };
 
+// ═══════════════════════════════════════════════════════════════
+//  AUDIO MAP
+//  Maps intent keys → pre-rendered ElevenLabs MP3 filenames
+//  Loaded from CFG.cdnBase + filename
+//  TO ADD A NEW INTENT: add entry here + entry in RESPONSE_RULES
+//  Leave empty [] if no MP3 recorded yet (falls back to TTS)
+// ═══════════════════════════════════════════════════════════════
+const AUDIO_MAP = {
+  greet:     ['greet_01.mp3','greet_02.mp3','greet_03.mp3','greet_04.mp3'],
+  inventory: ['inventory_01.mp3','inventory_02.mp3'],
+  trucks:    ['trucks_01.mp3','trucks_02.mp3'],
+  electric:  ['electric_01.mp3','electric_02.mp3'],
+  mustang:   ['mustang_01.mp3'],
+  suv:       ['suv_01.mp3','suv_02.mp3'],
+  sedan:     ['sedan_01.mp3'],
+  finance:   ['finance_01.mp3'],
+  hours:     ['hours_01.mp3'],
+  service:   ['service_01.mp3','service_02.mp3'],
+  consult:   ['consult_01.mp3'],
+  bookStart: ['book_start_01.mp3','book_start_02.mp3'],
+  thanks:    ['thanks_01.mp3','thanks_02.mp3'],
+  bye:       ['bye_01.mp3','bye_02.mp3'],
+  fallback:  ['fallback_01.mp3','fallback_02.mp3'],
+  // Dynamic booking steps (bookVehicle, bookDate, etc.) are intentionally
+  // absent — they contain user-supplied names/dates so must use TTS
+};
+
+function pickAudioUrl(intentKey){
+  if(!CFG.cdnBase||!intentKey) return null;
+  const files=AUDIO_MAP[intentKey];
+  if(!files||files.length===0) return null;
+  return CFG.cdnBase.replace(/\/?$/,'/')+pick(files);
+}
+
+// Preload likely next audio while Alex is speaking
+function preloadAudio(intentKey){
+  const url=pickAudioUrl(intentKey);
+  if(!url)return;
+  const a=new Audio();
+  a.preload='auto';
+  a.src=url;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INTENT RULES — add new intents as single-line entries here
+//  { test: /regex/, key: 'mapKey', action: ()=>responseText }
+// ═══════════════════════════════════════════════════════════════
+const RESPONSE_RULES = [
+  // Booking triggers (must be first — highest priority)
+  {
+    test:/\b(book|schedule|appointment|reserve|arrange)\b|\btest.?drive\b|\bservice\s+appoint/i,
+    key:'bookStart',
+    action:(t)=>{
+      if(/service|mainten/i.test(t)) B.type='service appointment';
+      else if(/consult/i.test(t))     B.type='consultation';
+      else                             B.type='test drive';
+      B.active=true; B.step=0;
+      progEl.style.display='flex'; setProgress(0);
+      return pick(R.bookStart);
+    }
+  },
+  { test:/\b(truck|pickup|f.?150|silverado|\bram\b|tacoma|tundra)\b/i,    key:'trucks',    action:()=>pick(R.trucks)    },
+  { test:/\b(electric|ev\b|bolt\b|ioniq|mach.?e|tesla|plug.?in)\b/i,      key:'electric',  action:()=>pick(R.electric)  },
+  { test:/\bmustang\b/i,                                                     key:'mustang',   action:()=>R.mustang[0]      },
+  { test:/\b(suv|crossover|explorer|equinox|rav4|sportage|awd)\b/i,        key:'suv',       action:()=>pick(R.suv)       },
+  { test:/\b(sedan|civic|camry|sonata|four.?door)\b/i,                      key:'sedan',     action:()=>R.sedan[0]        },
+  { test:/\b(financ|loan|apr|monthly|payment|trade.?in|credit)\b/i,         key:'finance',   action:()=>R.finance[0]      },
+  { test:/\b(hour|open|close|location|address|where|find\s*you|direction)\b/i, key:'hours', action:()=>R.hours[0]        },
+  { test:/\b(service|mainten|oil\s*change|repair|diagnos|detail)\b/i,       key:'service',   action:()=>pick(R.service)   },
+  { test:/\b(consult|meet|chat\s*with|speak\s*with|talk\s*to\s*someone)\b/i,key:'consult',  action:()=>R.consult[0]      },
+  { test:/\b(thank|thanks|appreciate|great|awesome|perfect)\b/i,            key:'thanks',    action:()=>pick(R.thanks)    },
+  { test:/\b(bye|goodbye|later|see\s*ya|gotta\s*go)\b/i,                    key:'bye',       action:()=>pick(R.bye)       },
+  { test:/\b(car|vehicle|inventory|stock|model|option|available|show\s*me)\b/i, key:'inventory', action:()=>pick(R.inventory) },
+  { test:/^(hi|hey|hello|good\s*(morning|afternoon|evening)|howdy)\b/i,    key:'greet',     action:()=>pick(R.greet)     },
+  // ── ADD NEW INTENTS ABOVE THIS LINE ──────────────────────────
+];
+
 // ── BOOKING HANDLER ──────────────────────────────────────────
 function handleBooking(input){
-  const step = STEPS[B.step];
-  if(step==='vehicle'){ B.vehicle=input.trim()||'a vehicle of your choice'; B.step++; setProgress(1); return R.bookVehicle(B.vehicle); }
-  if(step==='date')   { B.date=input.trim()||'a date to be confirmed';      B.step++; setProgress(2); return R.bookDate(B.date); }
-  if(step==='name')   { B.name=input.trim()||'Valued Customer';             B.step++; setProgress(3); return R.bookName(B.name); }
-  if(step==='phone')  { B.phone=input.trim()||'to be provided';             B.step++; setProgress(4); return R.bookPhone(B.phone); }
-  if(step==='email')  { B.email=input.trim(); const html=R.bookDone(B); resetBooking(); return html; }
+  const step=BOOKING_STEPS[B.step];
+  if(step==='vehicle'){ B.vehicle=input.trim()||'a vehicle of your choice'; B.step++; setProgress(1); return {reply:R.bookVehicle(B.vehicle),key:null};}
+  if(step==='date')   { B.date   =input.trim()||'a date to be confirmed';   B.step++; setProgress(2); return {reply:R.bookDate(B.date),key:null};   }
+  if(step==='name')   { B.name   =input.trim()||'Valued Customer';          B.step++; setProgress(3); return {reply:R.bookName(B.name),key:null};   }
+  if(step==='phone')  { B.phone  =input.trim()||'to be provided';           B.step++; setProgress(4); return {reply:R.bookPhone(B.phone),key:null}; }
+  if(step==='email')  { B.email  =input.trim(); const html=R.bookDone(B); submitBooking({...B}); resetBooking(); return {reply:html,key:null}; }
 }
 
-// ── MAIN RESPONSE ENGINE ─────────────────────────────────────
+// ── BOOKING WEBHOOK ──────────────────────────────────────────
+async function submitBooking(data){
+  try{
+    await fetch(CFG.bookingEndpoint,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...data,source:'alex-voice-agent',ts:new Date().toISOString()})
+    });
+  }catch(e){ console.warn('Booking submit failed:',e); }
+}
+
+// ── MAIN REPLY ENGINE ─────────────────────────────────────────
 function getReply(input){
   if(B.active) return handleBooking(input);
-  const t = input.toLowerCase();
-
-  // Booking triggers
-  if(/\b(book|schedule|appointment|reserve|arrange)\b/.test(t)||/\btest.?drive\b/.test(t)||/\bservice appoint/.test(t)){
-    if(/service|mainten/.test(t)) B.type='service appointment';
-    else if(/consult/.test(t)) B.type='consultation';
-    else B.type='test drive';
-    B.active=true; B.step=0;
-    progEl.style.display='flex'; setProgress(0);
-    return pick(R.bookStart);
+  const t=input.toLowerCase();
+  for(const rule of RESPONSE_RULES){
+    if(rule.test.test(t)){
+      return {reply:rule.action(t), key:rule.key};
+    }
   }
-
-  if(/\b(truck|pickup|f.?150|silverado|\bram\b|tacoma|tundra)\b/.test(t)) return pick(R.trucks);
-  if(/\b(electric|ev\b|bolt\b|ioniq|mach.?e|tesla|plug.?in|charging)\b/.test(t)) return pick(R.electric);
-  if(/\bmustang\b/.test(t)) return R.mustang[0];
-  if(/\b(suv|crossover|explorer|equinox|rav4|sportage|4x4|awd)\b/.test(t)) return R.suv[0];
-  if(/\b(sedan|civic|camry|sonata|four.?door)\b/.test(t)) return R.sedan[0];
-  if(/\b(financ|loan|apr|monthly|payment|trade.?in|credit|afford)\b/.test(t)) return R.finance[0];
-  if(/\b(hour|open|close|location|address|where|find you|directions)\b/.test(t)) return R.hours[0];
-  if(/\b(service|mainten|oil change|repair)\b/.test(t)) return R.service[0];
-  if(/\b(thank|thanks|appreciate|great|awesome|perfect)\b/.test(t)) return pick(R.thanks);
-  if(/\b(bye|goodbye|later|see ya|gotta go)\b/.test(t)) return pick(R.bye);
-  if(/\b(car|vehicle|inventory|stock|model|option|available|show me|what do)\b/.test(t)) return pick(R.inventory);
-  if(/^(hi|hey|hello|good\s*(morning|afternoon|evening)|howdy)\b/.test(t.trim())) return pick(R.greet);
-  return pick(R.fallback);
+  return {reply:pick(R.fallback), key:'fallback'};
 }
 
-// ── UI ────────────────────────────────────────────────────────
-function setStatus(state, text){
-  sdot.className = state;
-  stxt.textContent = text;
-  waveEl.classList.toggle('on', state==='listening');
+// ═══════════════════════════════════════════════════════════════
+//  ELEVENLABS STREAMING TTS (real-time generation)
+//  Used when no CDN MP3 exists for this turn
+// ═══════════════════════════════════════════════════════════════
+async function speakElevenLabs(text, whenDone){
+  if(!CFG.voiceId||!CFG.apiKey){ speakWebSpeech(text,whenDone); return; }
+  try{
+    setStatus('eleven','Alex is speaking — ElevenLabs...');
+    const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${CFG.voiceId}/stream`,{
+      method:'POST',
+      headers:{
+        'xi-api-key':CFG.apiKey,
+        'Content-Type':'application/json',
+        'Accept':'audio/mpeg'
+      },
+      body:JSON.stringify({
+        text:text,
+        model_id:'eleven_turbo_v2',
+        voice_settings:{
+          stability:0.38,          // lower = more expressive, less robotic gaps
+          similarity_boost:0.82,   // stay close to chosen voice
+          style:0.40,              // more natural conversational style
+          use_speaker_boost:true   // crisper, reduces muddy pauses
+        }
+      })
+    });
+    if(!res.ok) throw new Error('ElevenLabs API error: '+res.status);
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    playAudioUrl(url,()=>{URL.revokeObjectURL(url);if(whenDone)whenDone();},whenDone);
+  }catch(e){
+    console.warn('ElevenLabs streaming failed, falling back:',e);
+    speakWebSpeech(text,whenDone);
+  }
 }
 
-function addMsg(role, html){
-  const wrap = document.createElement('div');
-  wrap.className = `msg ${role}`;
-  const av = document.createElement('div');
-  av.className = 'ava';
-  av.textContent = role==='alex' ? 'A' : '🙂';
-  const b = document.createElement('div');
-  b.className = 'bub';
-  b.innerHTML = html.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  wrap.appendChild(av); wrap.appendChild(b);
-  chatEl.appendChild(wrap);
-  chatEl.scrollTop = chatEl.scrollHeight;
+// ── CDN MP3 PLAYER ────────────────────────────────────────────
+function playAudioUrl(url, onEnd, whenDone){
+  stopAll();
+  currentAudio=new Audio(url);
+  currentAudio.onplay  =()=>{ alexTalking=true; };
+  currentAudio.onended =()=>{
+    alexTalking=false; currentAudio=null;
+    if(onEnd)onEnd(); else if(whenDone)whenDone();
+    if(conversationOn) setTimeout(()=>startListening(),200);
+  };
+  currentAudio.onerror =()=>{
+    alexTalking=false; currentAudio=null;
+    // Fall through to Web Speech on MP3 error
+    if(whenDone) speakWebSpeech('',whenDone);
+    else if(conversationOn) setTimeout(()=>startListening(),400);
+  };
+  alexTalking=true;
+  currentAudio.play().catch(()=>{ if(whenDone) speakWebSpeech('',whenDone); });
 }
 
-function showTyping(){
-  removeTyping();
-  const d = document.createElement('div');
-  d.className='msg alex'; d.id='typ';
-  const av=document.createElement('div'); av.className='ava'; av.textContent='A';
-  const b=document.createElement('div'); b.className='bub tdots';
-  b.innerHTML='<span></span><span></span><span></span>';
-  d.appendChild(av); d.appendChild(b); chatEl.appendChild(d);
-  chatEl.scrollTop=chatEl.scrollHeight;
+// ── TEXT CLEANER — strips HTML and fixes TTS gap-causing punctuation ──
+function cleanForSpeech(rawHtml){
+  const tmp=document.createElement('div');
+  tmp.innerHTML=rawHtml;
+  let t=(tmp.textContent||tmp.innerText||'');
+  t=t.replace(/\s*—\s*/g,', ')        // em-dash → comma (no long pause)
+     .replace(/\s*–\s*/g,', ')        // en-dash
+     .replace(/\.{2,}/g,'.')          // ellipsis → single period
+     .replace(/\s*:\s*/g,', ')        // colons cause weird TTS stops
+     .replace(/([!?])\s+/g,'$1 ')     // tighten after ! ?
+     .replace(/\s{2,}/g,' ')          // collapse double spaces
+     .replace(/\n+/g,' ')             // strip newlines
+     .trim();
+  return t;
 }
-function removeTyping(){ const e=document.getElementById('typ'); if(e) e.remove(); }
 
-// ── SPEECH SYNTHESIS — natural, never cuts out ───────────────
-function speakText(rawHtml, whenDone){
-  // Strip HTML tags for voice
-  const tmp = document.createElement('div');
-  tmp.innerHTML = rawHtml;
-  let plain = (tmp.textContent||tmp.innerText||'').replace(/\s+/g,' ').trim();
-
+// ── WEB SPEECH FALLBACK ───────────────────────────────────────
+function speakWebSpeech(rawHtml, whenDone){
+  const plain=cleanForSpeech(rawHtml);
+  if(!plain) return;
   window.speechSynthesis.cancel();
   clearTimeout(resumeTimer);
-
-  const u = new SpeechSynthesisUtterance(plain);
-  u.rate   = 0.97;   // slightly slower = more natural
-  u.pitch  = 1.05;
-  u.volume = 1;
-
-  // Pick the most natural voice available
-  const voices = window.speechSynthesis.getVoices();
-  const preferred = [
-    'Samantha','Karen','Moira','Fiona',
-    'Google US English','Microsoft Aria','Microsoft Jenny',
-    'en-US-Neural','en-US'
+  const u=new SpeechSynthesisUtterance(plain);
+  u.rate=1.08; u.pitch=1.0; u.volume=1;
+  const voices=window.speechSynthesis.getVoices();
+  // Priority list: most natural-sounding US English voices first
+  const preferred=[
+    'Google US English','Samantha','Microsoft Aria Online (Natural)','Microsoft Jenny Online (Natural)',
+    'Microsoft Aria','Microsoft Jenny','Karen','Moira','en-US-Neural'
   ];
-  let chosen = null;
-  for(const name of preferred){
-    chosen = voices.find(v => v.name.includes(name) || v.lang === name);
-    if(chosen) break;
-  }
-  if(!chosen) chosen = voices.find(v => /en[-_]US/i.test(v.lang));
-  if(chosen) u.voice = chosen;
-
-  // Chrome bug fix: resume every 10s to prevent synthesis cutting out
-  function keepSynthAlive(){
-    clearTimeout(resumeTimer);
-    resumeTimer = setTimeout(()=>{
-      if(window.speechSynthesis.speaking){
-        window.speechSynthesis.pause();
-        window.speechSynthesis.resume();
-        keepSynthAlive();
-      }
-    }, 10000);
-  }
-
-  u.onstart = ()=>{
-    alexTalking = true;
-    keepSynthAlive();
-    setStatus('speaking', 'Alex is talking...');
-  };
-
-  u.onend = ()=>{
-    alexTalking = false;
-    clearTimeout(resumeTimer);
-    if(whenDone) whenDone();
-    // Auto-resume listening if conversation is on
-    if(conversationOn){
-      setTimeout(()=> startListening(), 400);
-    }
-  };
-
-  u.onerror = ()=>{
-    alexTalking = false;
-    clearTimeout(resumeTimer);
-    if(whenDone) whenDone();
-    if(conversationOn) setTimeout(()=> startListening(), 400);
-  };
-
+  let chosen=null;
+  for(const name of preferred){ chosen=voices.find(v=>v.name.includes(name)); if(chosen)break; }
+  if(!chosen) chosen=voices.find(v=>/en[-_]US/i.test(v.lang)&&v.localService===false); // prefer cloud voices
+  if(!chosen) chosen=voices.find(v=>/en[-_]US/i.test(v.lang));
+  if(chosen) u.voice=chosen;
+  function keepAlive(){clearTimeout(resumeTimer);resumeTimer=setTimeout(()=>{if(window.speechSynthesis.speaking){window.speechSynthesis.pause();window.speechSynthesis.resume();keepAlive();}},10000);}
+  u.onstart=()=>{ alexTalking=true; keepAlive(); setStatus('speaking','Alex is talking...'); };
+  u.onend  =()=>{ alexTalking=false; clearTimeout(resumeTimer); if(whenDone)whenDone(); if(conversationOn)setTimeout(()=>startListening(),200); };
+  u.onerror=()=>{ alexTalking=false; clearTimeout(resumeTimer); if(whenDone)whenDone(); if(conversationOn)setTimeout(()=>startListening(),200); };
   window.speechSynthesis.speak(u);
+}
+
+// ── UNIFIED SPEAK ENTRY POINT ────────────────────────────────
+// Priority: CDN MP3 → ElevenLabs stream → Web Speech
+function speakAlex(rawHtml, intentKey, whenDone){
+  stopAll();
+  const plain=stripHtml(rawHtml);
+  const cdnUrl=pickAudioUrl(intentKey);
+  if(cdnUrl){
+    setStatus('eleven','Alex is speaking — ElevenLabs...');
+    playAudioUrl(cdnUrl,null,whenDone);
+  } else if(CFG.voiceId&&CFG.apiKey&&plain){
+    speakElevenLabs(plain,whenDone);
+  } else {
+    setStatus('speaking','Alex is talking...');
+    speakWebSpeech(rawHtml,whenDone);
+  }
+}
+
+function stripHtml(h){ return cleanForSpeech(h); }
+
+function stopAll(){
+  if(currentAudio){currentAudio.pause();currentAudio=null;}
+  window.speechSynthesis.cancel();
+  clearTimeout(resumeTimer);
+  alexTalking=false;
 }
 
 // ── ALEX RESPONDS ─────────────────────────────────────────────
 function alexReply(userText){
-  if(!userText.trim()) return;
-  addMsg('user', userText);
-  liveEl.textContent = '';
+  if(!userText.trim())return;
+  addMsg('user',userText);
+  liveEl.textContent='';
   showTyping();
-
   setTimeout(()=>{
     removeTyping();
-    const reply = getReply(userText);
-    addMsg('alex', reply);
-    speakText(reply);
-    setStatus(B.active ? 'booking' : 'speaking', 'Alex is talking...');
-  }, 280 + Math.random()*200);
+    const {reply,key}=getReply(userText);
+    addMsg('alex',reply);
+    speakAlex(reply,key);
+    setStatus(B.active?'booking':'speaking','Alex is talking...');
+  },120+Math.random()*80);
 }
 
-function chip(text){
-  window.speechSynthesis.cancel();
-  alexReply(text);
-}
+function chip(text){ stopAll(); alexReply(text); }
 
-// ── SPEECH RECOGNITION — continuous loop ──────────────────────
+// ── SPEECH RECOGNITION ────────────────────────────────────────
 function initSR(){
-  const API = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!API){
-    micBtn.textContent = '⚠️  USE BUTTONS BELOW';
-    micBtn.disabled = true;
-    setStatus('error','Voice not supported — use Chrome on desktop');
-    return;
-  }
-  SR = new API();
-  SR.continuous      = false;  // non-continuous = more reliable final results
-  SR.interimResults  = true;
-  SR.lang            = 'en-US';
-  SR.maxAlternatives = 1;
-
-  SR.onstart = ()=>{
-    setStatus('listening', 'Listening... go ahead!');
-  };
-
-  SR.onresult = (e)=>{
-    let interim='', final='';
-    for(let i=e.resultIndex; i<e.results.length; i++){
-      const t = e.results[i][0].transcript;
-      if(e.results[i].isFinal) final += t;
-      else interim += t;
+  const API=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!API){ micBtn.textContent='⚠️  USE BUTTONS BELOW'; micBtn.disabled=true; setStatus('error','Voice not supported — use Chrome on desktop'); return; }
+  SR=new API();
+  SR.continuous=false; SR.interimResults=true; SR.lang='en-US'; SR.maxAlternatives=1;
+  SR.onstart=()=>setStatus('listening','Listening... go ahead!');
+  SR.onresult=(e)=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) final+=t; else interim+=t;
     }
-    liveEl.textContent = interim || final || '';
-
-    if(final.trim()){
+    liveEl.textContent=interim||final||'';
+    if(final.trim()){ clearTimeout(silenceTimer); liveEl.textContent=''; stopListening(); alexReply(final.trim()); }
+    else if(interim.trim()){
       clearTimeout(silenceTimer);
-      liveEl.textContent='';
-      stopListening();
-      alexReply(final.trim());
-    } else if(interim.trim()){
-      clearTimeout(silenceTimer);
-      silenceTimer = setTimeout(()=>{
-        if(interim.trim().length > 1){
-          liveEl.textContent='';
-          stopListening();
-          alexReply(interim.trim());
-        }
-      }, 1800);
+      silenceTimer=setTimeout(()=>{ if(interim.trim().length>1){ liveEl.textContent=''; stopListening(); alexReply(interim.trim()); }},1800);
     }
   };
-
-  SR.onerror = (e)=>{
+  SR.onerror=(e)=>{
     clearTimeout(silenceTimer);
-    if(e.error==='no-speech'){
-      // No speech — if conversation is on, restart listening quietly
-      if(conversationOn && !alexTalking){
-        setTimeout(()=> startListening(), 600);
-      }
-    } else if(e.error==='not-allowed'){
-      conversationOn = false;
-      updateMicBtn();
-      setStatus('error','Mic blocked — check browser permissions');
-    }
+    if(e.error==='no-speech'){ if(conversationOn&&!alexTalking) setTimeout(()=>startListening(),600); }
+    else if(e.error==='not-allowed'){ conversationOn=false; updateMicBtn(); setStatus('error','Mic blocked — check browser permissions'); }
   };
-
-  SR.onend = ()=>{
-    // Only auto-restart if conversation mode is on AND alex isn't talking
-    if(conversationOn && !alexTalking){
-      setTimeout(()=> startListening(), 300);
-    }
-  };
+  SR.onend=()=>{ if(conversationOn&&!alexTalking) setTimeout(()=>startListening(),300); };
 }
 
-function startListening(){
-  if(!SR || alexTalking) return;
-  try{ SR.abort(); } catch(e){}
-  try{ SR.start(); } catch(e){}
-}
-
-function stopListening(){
-  try{ SR.stop(); } catch(e){}
-}
+function startListening(){ if(!SR||alexTalking)return; try{SR.abort();}catch(e){} try{SR.start();}catch(e){} }
+function stopListening(){ try{SR.stop();}catch(e){} }
 
 function updateMicBtn(){
-  if(conversationOn){
-    micBtn.textContent = '🔴  END CONVERSATION';
-    micBtn.classList.add('on');
-  } else {
-    micBtn.textContent = '🎤  START TALKING TO ALEX';
-    micBtn.classList.remove('on');
-    setStatus('', 'Tap the mic — then just talk naturally');
-    waveEl.classList.remove('on');
-  }
+  if(conversationOn){ micBtn.textContent='🔴  END CONVERSATION'; micBtn.classList.add('on'); }
+  else{ micBtn.textContent='🎤  START TALKING TO ALEX'; micBtn.classList.remove('on'); setStatus('','Tap the mic — then just talk naturally'); waveEl.classList.remove('on'); }
 }
-
-micBtn.addEventListener('click', ()=>{
-  conversationOn = !conversationOn;
-  updateMicBtn();
-  if(conversationOn){
-    window.speechSynthesis.cancel();
-    startListening();
-  } else {
-    stopListening();
-    window.speechSynthesis.cancel();
-    clearTimeout(silenceTimer);
-    clearTimeout(resumeTimer);
-  }
+micBtn.addEventListener('click',()=>{
+  conversationOn=!conversationOn; updateMicBtn();
+  if(conversationOn){ stopAll(); startListening(); }
+  else{ stopListening(); stopAll(); clearTimeout(silenceTimer); }
 });
 
-// ── VOICE INIT — wait for voices to load ─────────────────────
-function initVoices(cb){
-  const voices = window.speechSynthesis.getVoices();
-  if(voices.length > 0){ cb(); return; }
-  window.speechSynthesis.onvoiceschanged = ()=>{ cb(); };
-  window.speechSynthesis.getVoices();
+// ── UI HELPERS ────────────────────────────────────────────────
+function setStatus(state,text){
+  sdot.className=state; stxt.textContent=text;
+  waveEl.classList.toggle('on',state==='listening');
 }
+function addMsg(role,html){
+  const wrap=document.createElement('div'); wrap.className=`msg ${role}`;
+  const av=document.createElement('div'); av.className='ava'; av.textContent=role==='alex'?'A':'🙂';
+  const b=document.createElement('div'); b.className='bub';
+  b.innerHTML=html.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  wrap.appendChild(av); wrap.appendChild(b); chatEl.appendChild(wrap);
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
+function showTyping(){ removeTyping(); const d=document.createElement('div'); d.className='msg alex'; d.id='typ'; const av=document.createElement('div'); av.className='ava'; av.textContent='A'; const b=document.createElement('div'); b.className='bub tdots'; b.innerHTML='<span></span><span></span><span></span>'; d.appendChild(av); d.appendChild(b); chatEl.appendChild(d); chatEl.scrollTop=chatEl.scrollHeight; }
+function removeTyping(){ const e=document.getElementById('typ'); if(e)e.remove(); }
+
+// ── VOICE INIT ────────────────────────────────────────────────
+function initVoices(cb){ const v=window.speechSynthesis.getVoices(); if(v.length>0){cb();return;} window.speechSynthesis.onvoiceschanged=()=>cb(); window.speechSynthesis.getVoices(); }
 
 // ── BOOT ──────────────────────────────────────────────────────
+if(CFG.voiceId) document.getElementById('elvbadge').style.display='';
 initSR();
 initVoices(()=>{
   setTimeout(()=>{
-    const intro = pick(R.greet);
-    addMsg('alex', intro);
-    speakText(intro);
-  }, 500);
+    const intro=pick(R.greet);
+    addMsg('alex',intro);
+    speakAlex(intro,'greet');
+  },500);
 });
+
+// Close config panel on outside click
+document.addEventListener('click',e=>{ if(!document.getElementById('cfg').contains(e.target)) document.getElementById('cfgpanel').classList.remove('open'); });
 </script>
 </body>
 </html>
